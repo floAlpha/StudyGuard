@@ -1,0 +1,7 @@
+[time]08:10 [task]练字15分钟 [detail] [finish]完成 [args]https://www.baidu.com/
+[time]08:25 [task]看论文 [detail] [finish]完成 [args]
+[time]09:08 [task]吃饭 [detail] [finish]完成 [args]
+[time]09:28 [task]测试任务 [detail] [finish] [args]https://www.baidu.com/
+[time]09:42 [task]编辑上半年任务 [detail] [finish]未完成 [args]C:\Users\chuan\Desktop\新建文本文档.txt
+[time]12:15 [task]领翼支付充值红包 [detail] [finish]未完成 [args]
+[time]20:02 [task]回顾18年下半年学习记录 [detail] [finish]取消任务 [args]

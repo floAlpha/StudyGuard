@@ -1,0 +1,36 @@
+[time]2019年02月20日 00:50[time] [content]召回率（recall）召回率是覆盖面的度量，度量有多个正例被分为正例，recall=TP/(TP+FN)=TP/P=sensitive，可以看到召回率与灵敏度是一样的。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 10:08[time] [content]WordPiece的一种主要的实现方式叫做BPE（Byte-Pair Encoding）双字节编码。 BPE的过程可以理解为把一个单词再拆分，使得我们的此表会变得精简，并且寓意更加清晰。比如"loved","loving","loves"这三个单词。其实本身的语义都是“爱”的意思，但是如果我们以单词为单位，那它们就算不一样的词，在英语中不同后缀的词非常的多，就会使得词表变的很大，训练速度变慢，训练的效果也不是太好。  BPE算法通过训练，能够把上面的3个单词拆分成"lov","ed","ing","es"几部分，这样可以把词的本身的意思和时态分开，有效的减少了词表的数量。WordPiece的一种主要的实现方式叫做BPE（Byte-Pair Encoding）双字节编码。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 10:24[time] [content]后面有时间会加一个笔记窗口，可以实时加笔记[content] [tag]NODISPLAY[tag]
+
+[time]2019年02月20日 14:51[time] [content]准确率（Accuracy）准确率是我们最常见的评价指标，而且很容易理解，就是被分对的样本数除以所有的样本数，通常来说，正确率越高，分类器越好。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 00:50[time] [content]召回率（recall）召回率是覆盖面的度量，度量有多个正例被分为正例，recall=TP/(TP+FN)=TP/P=sensitive，可以看到召回率与灵敏度是一样的。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 14:53[time] [content]灵敏度（sensitive）sensitive = TP/P，表示的是所有正例中被分对的比例，衡量了分类器对正例的识别能力。 [content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 14:53[time] [content]精确率、精度（Precision）表示被分为正例的示例中实际为正例的比例。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 14:55[time] [content]综合评价指标（F-Measure）P和R指标有时候会出现的矛盾的情况，这样就需要综合考虑他们，最常见的方法就是F-Measure（又称为F-Score）。F1综合了P和R的结果，当F1较高时则能说明试验方法比较有效。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 15:25[time] [content]word2vec or GloVe上下文无关[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 15:27[time] [content]ELMo和ULMFit都是单向的或浅双向的。这意味着每个单词只使用其左边(或右边)的单词进行上下文化。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 16:55[time] [content]Tensor2Tensor notebook[content] [tag]DISPLAY[tag]
+
+[time]2019年02月20日 21:49[time] [content]BERT https://zhuanlan.zhihu.com/p/54356280[content] [tag]DISPLAY[tag]
+
+[time]2019年02月21日 10:14[time] [content]BERT的全称是Bidirectional Encoder Representation from Transformers，即双向Transformer的Encoder，因为decoder是不能获要预测的信息的。模型的主要创新点都在pre-train方法上，即用了Masked LM和Next Sentence Prediction两种方法分别捕捉词语和句子级别的representation。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月21日 14:27[time] [content]Transfomer源码解读 https://terrifyzhao.github.io/2019/01/11/Transformer%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB.html[content] [tag]DISPLAY[tag]
+
+[time]2019年02月21日 16:33[time] [content]Dropout可以比较有效的缓解过拟合的发生，在一定程度上达到正则化的效果。Dropout可以作为训练深度神经网络的一种trick供选择。在每个训练批次中，通过忽略一半的特征检测器（让一半的隐层节点值为0），可以明显地减少过拟合现象。这种方式可以减少特征检测器（隐层节点）间的相互作用，检测器相互作用是指某些检测器依赖其他检测器才能发挥作用。[content] [tag]DISPLAY[tag]
+
+[time]2019年02月21日 19:54[time] [content]111 2任务七二无视对方撒发s'f[content] [tag]DISPLAY[tag]
+
+[time]2019年02月21日 20:11[time] [content]阿斯顿发生[content] [tag]DISPLAY[tag]
+
+[time]2019年02月21日 21:31[time] [content]凡事要搞清楚，搞明白，浅尝辄止最后会一无所获[content] [tag]DISPLAY[tag]
+

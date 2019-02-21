@@ -1,0 +1,8 @@
+[pausequery]00:00[pausequery] [detail]自动关闭学习询问时间
+[startquery]07:30[startquery] [detail]自动开启学习询问时间
+[dailysumtime]22:00[dailysumtime] [detail]生成每日学习报告时间，必须在当天00:00之前
+[cascadedelay]false[cascadedelay] [detail]推迟一个任务，当天该任务之后的任务是否级联推迟
+[nomainwindow]true[nomainwindow] [detail]无主界面启动，程序常驻后台
+[nextideashow]1[nextideashow] [detail]显示idea的时间间隔，时间单位分钟，设置为0则随机出现下一条idea回顾
+[randomideashow]true[randomideashow] [detail]随机回顾记录的idea
+[askfordoing]true[askfordoing] [detail]开启随机询问学习情况[detail]
