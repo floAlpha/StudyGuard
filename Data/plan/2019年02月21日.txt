@@ -1,4 +1,4 @@
-[time]10:55[time] [task]服务撒啊我色弱发[task] [detail][detail] [args][args] [finish][finish]
+[time]10:55[time] [task]服务撒啊我色弱发[task] [detail][detail] [args][args] [finish]完成[finish]
 
-[time]18:57[time] [task]测试[task] [detail][detail] [args][args] [finish][finish]
+[time]23:50[time] [task]测试[task] [detail][detail] [args][args] [finish][finish]
 

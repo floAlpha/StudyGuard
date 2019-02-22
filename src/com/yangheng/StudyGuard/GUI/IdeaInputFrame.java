@@ -50,6 +50,8 @@ public class IdeaInputFrame extends JFrame {
 		contentPane.add(scrollPane);
 		
 		JTextArea textArea = new JTextArea();
+		textArea.setWrapStyleWord(true);
+		textArea.setLineWrap(true);
 		scrollPane.setViewportView(textArea);
 		
 		JButton submit = new JButton("\u4FDD\u5B58");

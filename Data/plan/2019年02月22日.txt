@@ -1,0 +1,12 @@
+[time]08:30[time] [task]练字（10分钟）[task] [detail][detail] [args][args] [finish][finish]
+
+[time]08:43[time] [task]学习tensorflow API[task] [detail][detail] [args]https://tensorflow.google.cn/guide/keras?hl=zh-cn[args] [finish][finish]
+
+[time]10:00[time] [task]学习Droupout原理[task] [detail]5分钟[detail] [args]https://zhuanlan.zhihu.com/p/38200980[args] [finish][finish]
+
+[time]10:05[time] [task]看Keras API(半小时)[task] [detail][detail] [args]https://keras.io/[args] [finish][finish]
+
+[time]10:35[time] [task]在服务器上运行Bert代码[task] [detail][detail] [args][args] [finish][finish]
+
+[time]11:50[time] [task]休息40分钟，吃午饭[task] [detail][detail] [args][args] [finish][finish]
+

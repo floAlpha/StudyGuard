@@ -108,6 +108,9 @@ public class Utils {
 
 			String encoding = "GBK";
 			File file = new File(filePath);
+			if (!file.exists()) {
+				file.createNewFile();
+			}
 			if (file.isFile() && file.exists()) { // 判断文件是否存在
 				InputStreamReader read = new InputStreamReader(new FileInputStream(file), encoding);// 考虑到编码格式
 				BufferedReader bufferedReader = new BufferedReader(read);

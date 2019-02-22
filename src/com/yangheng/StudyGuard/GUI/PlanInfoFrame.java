@@ -1,6 +1,7 @@
 package com.yangheng.StudyGuard.GUI;
 
 import java.awt.AWTEvent;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
@@ -10,7 +11,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -370,33 +370,29 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
+		
+		while (true) {
+			
+			for (int i = 0; i < Notifier.planlist.size(); i++) {
+				StudyPlan sp = new StudyPlan(Notifier.planlist.get(i));
+				tasks.get(i).setText(sp.getTask());
+				labels.get(i).setText(sp.getTime());
+				labels_finish.get(i).setText(sp.getFinish());
+				if (labels_finish.get(i).getText().equals("完成")) {
+					labels_finish.get(i).setForeground(Color.GREEN);
+				} else if (labels_finish.get(i).getText().equals("未完成")) {
+					labels_finish.get(i).setForeground(Color.RED);
+				} else {
+					labels_finish.get(i).setForeground(Color.GRAY);
+				}
+			}
 
-		for (String string : new ArrayList<String>(Notifier.planlist)) {
-			StudyPlan sp = new StudyPlan(string);
-			Iterator<JTextField> it1 = tasks.iterator();
-			Iterator<JLabel> it2 = labels.iterator();
-			Iterator<JLabel> it3 = labels_finish.iterator();
-			for (; it1.hasNext();) {
-				JTextField textField;
-				if ((textField = it1.next()).getText().equals("")) {
-					textField.setText(sp.getTask());
-					break;
-				}
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			for (; it2.hasNext();) {
-				JLabel label;
-				if ((label = it2.next()).getText().equals("")) {
-					label.setText(sp.getTime());
-					break;
-				}
-			}
-			for (; it3.hasNext();) {
-				JLabel label;
-				if ((label = it3.next()).getText().equals("")) {
-					label.setText(sp.getFinish());
-					break;
-				}
-			}
+
 		}
 
 	}

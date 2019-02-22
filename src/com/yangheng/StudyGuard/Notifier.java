@@ -1,6 +1,7 @@
 package com.yangheng.StudyGuard;
 
 import java.awt.TrayIcon.MessageType;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -88,23 +89,26 @@ public class Notifier extends Thread {
 					String string = planlist.get(i);
 					StudyPlan sp = new StudyPlan(string);
 					if (Utils.getTime().substring(12, 17).equals(sp.getTime())) {
-						StudyPlan sp1 = new StudyPlan(planlist.get(i - 1));
-						if (i > 0) {
-							int answer = JOptionPane.showConfirmDialog(null, "上一任务[ " + (sp1.getTask()) + " ]是否完成？",
-									"警告", JOptionPane.YES_NO_OPTION);
-							if (answer == 0) {
-								sp1.setFinish("完成");
-								planlist.set(i - 1, sp1.toString());
-							}else {
-								sp1.setFinish("未完成");
-								planlist.set(i - 1, sp1.toString());
+						for (int j = 0; j < i; j++) {
+							StudyPlan sp1 = new StudyPlan(planlist.get(j));
+							if (sp1.getFinish().equals("")) {
+//								java.awt.Toolkit.getDefaultToolkit().beep();
+								int answer = JOptionPane.showConfirmDialog(null,
+										sp1.getTime() + " 任务[ " + (sp1.getTask()) + " ]是否完成？", "警告",
+										JOptionPane.YES_NO_OPTION);
+								if (answer == 0) {
+									sp1.setFinish("完成");
+									planlist.set(j, sp1.toString());
+								} else {
+									sp1.setFinish("未完成");
+									planlist.set(j, sp1.toString());
+								}
 							}
-
 						}
-						java.awt.Toolkit.getDefaultToolkit().beep();
+
 						Object[] options = { "接受任务", "推迟10分钟", "推迟20分钟", "推迟30分钟", "取消任务" };
 
-						Object selectedItem = JOptionPane.showInputDialog(null, "学习计划:\n" + sp.getTask(), "接下来的任务!",
+						Object selectedItem = JOptionPane.showInputDialog(null, "此刻的任务:\n" + sp.getTask(), "学习计划",
 								JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 						switch (selectedItem.toString()) {
@@ -138,17 +142,31 @@ public class Notifier extends Thread {
 						default:
 							try {
 								if (!sp.getArgs().equals(null) && !sp.getArgs().equals("")) {
-									Runtime.getRuntime().exec("explorer " + sp.getArgs());
-									Runtime.getRuntime().exec(sp.getArgs());
+									// System.out.println("explorer " +
+									// sp.getArgs());
+									if (sp.getArgs().startsWith("http") || sp.getArgs().startsWith("www")) {
+										Runtime.getRuntime().exec("cmd /c start " + sp.getArgs());
+									} else if (sp.getArgs().startsWith("C:") || sp.getArgs().startsWith("D:")
+											|| sp.getArgs().startsWith("E:") || sp.getArgs().startsWith("F:")
+											|| sp.getArgs().startsWith("G:") || sp.getArgs().startsWith("H:")
+											|| sp.getArgs().startsWith("I:") || sp.getArgs().startsWith("J:")) {
+										Runtime.getRuntime().exec("explorer " + sp.getArgs());
+										Runtime.getRuntime().exec(sp.getArgs());
+									}
+
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 						}
-
+						File file = new File(MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11));
+						if (file.exists()) {
+							file.delete();
+						}
 						PlanInfoFrame planInfoFrame = PlanInfoFrame.getInstance();
 						planInfoFrame.setVisible(true);
 						new Thread(planInfoFrame).start();
+
 					}
 				}
 				Collections.sort((List<String>) planlist, new Comparator<String>() {

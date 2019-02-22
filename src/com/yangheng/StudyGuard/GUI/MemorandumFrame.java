@@ -28,12 +28,13 @@ public class MemorandumFrame extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField year;
-	private JTextField mon;
-	private JTextField day;
-	private JTextField hour;
-	private JTextField min;
-	private JTextArea task;
+
+	private static JTextField year;
+	private static JTextField mon;
+	private static JTextField day;
+	private static JTextField hour;
+	private static JTextField min;
+	private static JTextArea task;
 
 	static MemorandumFrame instance = null;
 
@@ -49,6 +50,7 @@ public class MemorandumFrame extends JFrame implements Runnable {
 				}
 			}
 		}
+		task.setText("");
 		return instance;
 	}
 
@@ -60,6 +62,9 @@ public class MemorandumFrame extends JFrame implements Runnable {
 					if (Integer.parseInt(day.getText()) > 0 && Integer.parseInt(day.getText()) < 32) {
 						if (Integer.parseInt(hour.getText()) >= 0 && Integer.parseInt(hour.getText()) < 24) {
 							if (Integer.parseInt(min.getText()) >= 0 && Integer.parseInt(mon.getText()) < 60) {
+								if (!task.getText().equals("")&&!task.getText().equals(null)) {
+									
+								}
 								takeMemorandum(year.getText() + "年" + mon.getText() + "月" + day.getText() + "日" + " "
 										+ hour.getText() + ":" + min.getText(), task.getText());
 								dispose();
@@ -97,7 +102,7 @@ public class MemorandumFrame extends JFrame implements Runnable {
 						storeMemo();
 						dispose();
 					}
-					
+
 				}
 			}
 
@@ -187,23 +192,9 @@ public class MemorandumFrame extends JFrame implements Runnable {
 		JButton submit = new JButton("\u63D0\u4EA4");
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					if (Integer.parseInt(year.getText()) > 0) {
-						if (Integer.parseInt(mon.getText()) > 0 && Integer.parseInt(mon.getText()) < 13) {
-							if (Integer.parseInt(day.getText()) > 0 && Integer.parseInt(day.getText()) < 32) {
-								if (Integer.parseInt(hour.getText()) >= 0 && Integer.parseInt(hour.getText()) < 24) {
-									if (Integer.parseInt(min.getText()) >= 0 && Integer.parseInt(mon.getText()) < 60) {
-										takeMemorandum(year.getText() + "年" + mon.getText() + "月" + day.getText() + "日"
-												+ "" + hour.getText() + ":" + min.getText(), task.getText());
-										dispose();
-									}
-								}
-							}
-						}
-					}
-				} catch (Exception formatException) {
-					MainGuardFrame.showToast("错误", "备忘录时间格式有误", MessageType.ERROR);
-				}
+
+				storeMemo();
+				dispose();
 			}
 		});
 		submit.setFont(new Font("楷体", Font.PLAIN, 16));
@@ -253,7 +244,7 @@ public class MemorandumFrame extends JFrame implements Runnable {
 		for (String string : memorandums) {
 			Memorandum memorandum = new Memorandum(string);
 
-			if (memorandum.getTime().contains(Utils.getTime().substring(12, 17))) {
+			if (memorandum.getTime().contains(Utils.getTime())) {
 				MainGuardFrame.showToast("[备忘录]" + memorandum.getTime(), memorandum.getContent(), MessageType.INFO);
 			}
 
@@ -261,13 +252,16 @@ public class MemorandumFrame extends JFrame implements Runnable {
 	}
 
 	public static void takeMemorandum(String time, String content) {
-		Memorandum memorandum = new Memorandum(time, content);
-		ArrayList<String> arrayList = new ArrayList<String>();
-		arrayList.add(memorandum.toString());
-		try {
-			Utils.writeObjectsToFile(arrayList, MainGuardFrame.filePath + "\\memorandum\\memorandum.txt");
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!time.equals("") && !content.equals("")) {
+			Memorandum memorandum = new Memorandum(time, content);
+			ArrayList<String> arrayList = new ArrayList<String>();
+			arrayList.add(memorandum.toString());
+			try {
+				Utils.writeObjectsToFile(arrayList, MainGuardFrame.filePath + "\\memorandum\\memorandum.txt");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 	}

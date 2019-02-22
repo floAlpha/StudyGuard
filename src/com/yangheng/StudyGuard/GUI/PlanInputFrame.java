@@ -46,17 +46,16 @@ public class PlanInputFrame extends JFrame {
 	private JTextField day;
 
 	private void planInput() {
-		if (Integer.parseInt(hour.getText()) > 0 && Integer.parseInt(min.getText()) >= 0 && !task.getText().equals(null)
-				&& !task.getText().equals("")) {
-//			ArrayList<String> planList = new ArrayList<String>();
+		if (Integer.parseInt(hour.getText()) >= 0 && Integer.parseInt(min.getText()) >= 0
+				&& !task.getText().equals(null) && !task.getText().equals("")) {
+			// ArrayList<String> planList = new ArrayList<String>();
 			StudyPlan studyPlan = new StudyPlan(
 					"[time]" + hour.getText() + ":" + min.getText() + "[time] [task]" + task.getText()
 							+ "[task] [detail]" + detail.getText() + "[detail] [args]" + args.getText() + "[args]");
-			// System.out.println("[time]" + hour.getText() + ":" +
-			// min.getText() + "[time] [task]" + task.getText()
-			// + "[task] [detail]" + detail.getText() + "[detail] [args]" +
-			// args.getText()
-			// + "[args] [finish][finish]");
+			System.out.println("[time]" + hour.getText() + ":" + min.getText() + "[time] [task]" + task.getText()
+					+ "[task] [detail]" + detail.getText() + "[detail] [args]" + args.getText()
+					+ "[args] [finish][finish]");
+			
 			try {
 				ArrayList<String> newplan = new ArrayList<String>();
 				newplan.add(studyPlan.toString());
