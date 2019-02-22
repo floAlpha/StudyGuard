@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -40,16 +41,16 @@ import com.yangheng.StudyGuard.Utils.Utils;
  * @author chuan
  *
  */
-public class MainGuardFrame extends JFrame {
+public class MainGuardFrame extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	public static String filePath;
-//	public static String studyPlanPath;
+	// public static String studyPlanPath;
 	Watcher watcher;
 
-	private static SystemTray systemTray;// 系统托盘
-	private static TrayIcon trayIcon;// 托盘图标
+	public static SystemTray systemTray;// 系统托盘
+	public static TrayIcon trayIcon;// 托盘图标
 
 	static String realPath = "./";
 
@@ -80,7 +81,8 @@ public class MainGuardFrame extends JFrame {
 
 	public static void main(String[] args) {
 
-		getInstance();
+		MainGuardFrame mainframe = MainGuardFrame.getInstance();
+		new Thread(mainframe).start();
 	}
 
 	private static MainGuardFrame instance = null;
@@ -91,7 +93,7 @@ public class MainGuardFrame extends JFrame {
 		try {
 			systemTray = SystemTray.getSystemTray();
 			Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
-			trayIcon = new TrayIcon(image, "正在运行，右键点击图标或者使用CTRL+SHIFT+X热键显示Idea回顾");
+			trayIcon = new TrayIcon(image, "正在运行");
 			trayIcon.setImageAutoSize(true);
 			systemTray.add(trayIcon);
 
@@ -114,7 +116,7 @@ public class MainGuardFrame extends JFrame {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-//					System.out.println(Utils.nomainwindow);
+					// System.out.println(Utils.nomainwindow);
 					if (Utils.nomainwindow.equals("true")) {
 						instance.setVisible(false);
 						instance.setAlwaysOnTop(false);
@@ -130,7 +132,7 @@ public class MainGuardFrame extends JFrame {
 		return instance;
 	}
 
-	public MainGuardFrame() {
+	private MainGuardFrame() {
 
 		trayIcon.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -164,9 +166,6 @@ public class MainGuardFrame extends JFrame {
 
 			@Override
 			public void windowOpened(WindowEvent e) {
-				// setExtendedState(JFrame.ICONIFIED);
-				// dispose();// 窗口最小化时dispose该窗口
-
 			}
 		});
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -183,7 +182,7 @@ public class MainGuardFrame extends JFrame {
 			}
 		}, AWTEvent.KEY_EVENT_MASK);
 
-		this.setExtendedState(JFrame.ICONIFIED);
+		// this.setExtendedState(JFrame.ICONIFIED);
 
 		Toolkit kit = Toolkit.getDefaultToolkit(); // 定义工具包
 		Dimension screenSize = kit.getScreenSize(); // 获取屏幕的尺寸
@@ -245,7 +244,7 @@ public class MainGuardFrame extends JFrame {
 		JButton takeidea = new JButton("\u65B0\u5EFAIDEA (F1)");
 		takeidea.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				IdeaFrame.storeIdea();
+				// IdeaFrame.storeIdea();
 				new IdeaInputFrame().setVisible(true);
 			}
 		});
@@ -288,9 +287,10 @@ public class MainGuardFrame extends JFrame {
 		});
 
 		filePath = realPath + "Data";
-//		studyPlanPath = filePath + "/plan/学习计划.txt";
+		// studyPlanPath = filePath + "/plan/学习计划.txt";
 
-		watcher = new Watcher(filePath, MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
+		watcher = new Watcher(filePath,
+				MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
 		Watcher.load_study_plan();
 		watcher.start();
 
@@ -350,7 +350,7 @@ public class MainGuardFrame extends JFrame {
 			public void onHotKey(int markCode) {
 				switch (markCode) {
 				case GLOBAL_HOT_KEY_1:
-//					IdeaFrame.storeIdea();
+					// IdeaFrame.storeIdea();
 					new IdeaInputFrame().setVisible(true);
 					break;
 				case GLOBAL_HOT_KEY_3:
@@ -372,8 +372,9 @@ public class MainGuardFrame extends JFrame {
 				case GLOBAL_HOT_KEY_5:
 					showToast("提示", "使用CTRL+SHIFT+Z热键创建当日新计划条目", MessageType.INFO);
 					try {
-						Runtime.getRuntime().exec(("explorer " + filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt")
-								.replace('/', '\\'));
+						Runtime.getRuntime()
+								.exec(("explorer " + filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt")
+										.replace('/', '\\'));
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -405,6 +406,21 @@ public class MainGuardFrame extends JFrame {
 				}
 			}
 		});
+
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			try {
+				Thread.sleep(3000);// 5分钟
+			} catch (InterruptedException e) {
+			}
+			ArrayList<String> proverbs = Utils
+					.readTxtFileIntoStringArrList(MainGuardFrame.filePath + "\\proverb\\proverb.txt");
+			MainGuardFrame.trayIcon.setToolTip(proverbs.get(((int) (Math.random() * proverbs.size()))));
+
+		}
 
 	}
 

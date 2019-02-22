@@ -177,6 +177,19 @@ public class Utils {
 		if (!file.isFile()) {
 			file.createNewFile();
 		}
+		Collections.sort((List<String>) objects, new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				if (o1.compareTo(o2) < 0) {
+					return -1;
+				} else if (o1.compareTo(o2) == 0) {
+					return 0;
+				} else {
+					return 1;
+				}
+
+			}
+		});
 		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true)));

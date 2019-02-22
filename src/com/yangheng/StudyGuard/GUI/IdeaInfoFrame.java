@@ -138,7 +138,7 @@ public class IdeaInfoFrame extends JFrame {
 				}
 			}
 		});
-		btnNewButton.setFont(new Font("Ώ¬Με", Font.PLAIN, 16));	
+		btnNewButton.setFont(new Font("Ώ¬Με", Font.PLAIN, 16));
 		btnNewButton.setBounds(188, 342, 148, 23);
 		contentPane.add(btnNewButton);
 		invalidate();
@@ -148,5 +148,7 @@ public class IdeaInfoFrame extends JFrame {
 		textArea.setText(idea.getContent());
 		invalidate();
 	}
+
+
 
 }

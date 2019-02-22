@@ -62,8 +62,8 @@ public class MemorandumFrame extends JFrame implements Runnable {
 					if (Integer.parseInt(day.getText()) > 0 && Integer.parseInt(day.getText()) < 32) {
 						if (Integer.parseInt(hour.getText()) >= 0 && Integer.parseInt(hour.getText()) < 24) {
 							if (Integer.parseInt(min.getText()) >= 0 && Integer.parseInt(mon.getText()) < 60) {
-								if (!task.getText().equals("")&&!task.getText().equals(null)) {
-									
+								if (!task.getText().equals("") && !task.getText().equals(null)) {
+
 								}
 								takeMemorandum(year.getText() + "年" + mon.getText() + "月" + day.getText() + "日" + " "
 										+ hour.getText() + ":" + min.getText(), task.getText());
@@ -243,8 +243,8 @@ public class MemorandumFrame extends JFrame implements Runnable {
 				(MainGuardFrame.filePath + "/memorandum/memorandum.txt").replace('/', '\\'));
 		for (String string : memorandums) {
 			Memorandum memorandum = new Memorandum(string);
-
-			if (memorandum.getTime().contains(Utils.getTime())) {
+			if (Utils.getTime().contains(memorandum.getTime())) {
+//				 System.out.println(memorandum.toString());
 				MainGuardFrame.showToast("[备忘录]" + memorandum.getTime(), memorandum.getContent(), MessageType.INFO);
 			}
 

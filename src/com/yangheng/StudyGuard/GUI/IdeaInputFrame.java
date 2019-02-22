@@ -30,6 +30,7 @@ public class IdeaInputFrame extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		setLocationRelativeTo(null);
 		
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
 		toolkit.addAWTEventListener(new AWTEventListener() {
@@ -50,6 +51,7 @@ public class IdeaInputFrame extends JFrame {
 		contentPane.add(scrollPane);
 		
 		JTextArea textArea = new JTextArea();
+		textArea.setFont(new Font("¿¬Ìå", Font.PLAIN, 16));
 		textArea.setWrapStyleWord(true);
 		textArea.setLineWrap(true);
 		scrollPane.setViewportView(textArea);

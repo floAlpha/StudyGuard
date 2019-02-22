@@ -95,6 +95,7 @@ public class IdeaFrame extends JFrame implements Runnable {
 		while ( count < ideas.size()) {
 			int i = ((int) (Math.random() * ideas.size()));
 //			System.out.println(ideas.get(i).getTag());
+			System.out.println(ideas.get(i));
 			if (ideas.get(i).getTag().equals("DISPLAY")){
 				MainGuardFrame.showToast("使用CTRL+SHIFT+X热键查看详情", ideas.get(i).getContent().replace("*#&", "\n"), MessageType.INFO);
 				currentmind=ideas.get(i);

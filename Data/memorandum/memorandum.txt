@@ -1,6 +1,9 @@
-[time]2019年02月20日##17:25[time] [content]11111[content]
+[time]2019年02月21日 08:30[time] [content]检查team是否有退出提示[content]
 
-[time]2019年02月21日##00:17[time] [content]341223423[content][time]2019年02月21日##00:49[time] [content][content]
+[time]2019年02月22日 12:25[time] [content]去205注册学生证[content]
 
-[time]2019年02月21日##00:50[time] [content]睡觉[content]
+[time]2019年09月06日 10:00[time] [content]爸爸妈妈的生日都快到了，给他们买点礼物吧[content]
 
+[time]2019年02月22日 22:00[time] [content]把洗发水放到书包里[content]
+
+[time]2019年02月22日 18:30[time] [content]把数据结构课程设计修复能运行然后上传到Github[content]

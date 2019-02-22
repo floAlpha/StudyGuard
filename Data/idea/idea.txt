@@ -28,8 +28,6 @@
 
 [time]2019年02月21日 16:33[time] [content]Dropout可以比较有效的缓解过拟合的发生，在一定程度上达到正则化的效果。Dropout可以作为训练深度神经网络的一种trick供选择。在每个训练批次中，通过忽略一半的特征检测器（让一半的隐层节点值为0），可以明显地减少过拟合现象。这种方式可以减少特征检测器（隐层节点）间的相互作用，检测器相互作用是指某些检测器依赖其他检测器才能发挥作用。[content] [tag]DISPLAY[tag]
 
-[time]2019年02月21日 19:54[time] [content]111 2任务七二无视对方撒发s'f[content] [tag]DISPLAY[tag]
-
 [time]2019年02月21日 20:11[time] [content]阿斯顿发生[content] [tag]DISPLAY[tag]
 
 [time]2019年02月21日 21:31[time] [content]凡事要搞清楚，搞明白，浅尝辄止最后会一无所获[content] [tag]DISPLAY[tag]
