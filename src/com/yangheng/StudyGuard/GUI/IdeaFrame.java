@@ -9,7 +9,6 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.AWTEventListener;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -21,20 +20,19 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import com.yangheng.StudyGuard.Notifier;
+import com.yangheng.StudyGuard.PlanNotifier;
 import com.yangheng.StudyGuard.Object.Idea;
 import com.yangheng.StudyGuard.Object.Mind;
 import com.yangheng.StudyGuard.Utils.Utils;
 
 public class IdeaFrame extends JFrame implements Runnable {
 
-
 	private static final long serialVersionUID = 1L;
-	static String mindpath = MainGuardFrame.filePath + "\\idea";
-	static IdeaFrame instance = null;
-	static ArrayList<Idea> ideas = getIdeas(mindpath);
+	static String mindpath = MainFrame.filePath + "\\idea";
+	public static IdeaFrame instance = null;
+	static ArrayList<String> ideas;
 	public static Idea currentmind = null;
-	
+
 	// 实现阻止程序多次启动
 	public static IdeaFrame getInstance() {
 
@@ -51,68 +49,58 @@ public class IdeaFrame extends JFrame implements Runnable {
 		return instance;
 	}
 
-
-	public static void storeIdea(String idea) {
-		System.out.println(idea);
-		IdeaFrame mindFrame = IdeaFrame.getInstance();
-		mindFrame.setVisible(true);
-		Mind mind = new Mind(Utils.getTime().substring(0, 17), idea.replace("\n", "*#&"), "DISPLAY");
-		System.out.println(mind.toString());
-		if (!idea.trim().equals(null)) {
-			try {
-				ArrayList<String> arrayList = new ArrayList<String>();
-				arrayList.add(mind.toString());
-				Utils.writeObjectsToFile(arrayList,
-						MainGuardFrame.filePath + "\\idea\\idea.txt");
-				instance.dispose();
-				instance = new IdeaFrame();
-				instance.setVisible(true);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private static ArrayList<Idea> getIdeas(String mindpath) {
-		ArrayList<String> minddatabase = Utils.getFiles(mindpath);
-		ArrayList<String> mindlist = Utils
-				.readTxtFileIntoStringArrList(minddatabase.get((int) (Math.random() * minddatabase.size())));
-		ArrayList<Idea> ideas = new ArrayList<Idea>();
-		for (int i = 0; i < mindlist.size(); i++) {
-			ideas.add(new Idea(mindlist.get(i)));
-		}
-		return ideas;
-	}
-
 	public void showIdea() {
+		ArrayList<Idea> ideas = MainFrame.ioUtils.getIdeas(mindpath);
 
-		ArrayList<Idea> ideas = getIdeas(mindpath);
-//		System.out.println(ideas);
-		int count = 0;
-		if (ideas.size()==0) {
-			return;
-		}
-		while ( count < ideas.size()) {
-			int i = ((int) (Math.random() * ideas.size()));
-//			System.out.println(ideas.get(i).getTag());
-			System.out.println(ideas.get(i));
-			if (ideas.get(i).getTag().equals("DISPLAY")){
-				MainGuardFrame.showToast("使用CTRL+SHIFT+X热键查看详情", ideas.get(i).getContent().replace("*#&", "\n"), MessageType.INFO);
-				currentmind=ideas.get(i);
-				return;
+		ArrayList<String> idea_pic = Utils.getFiles(MainFrame.filePath + "\\idea\\pic");
+
+		for (int i = 0; i < idea_pic.size(); i++) {
+			if (idea_pic.get(i).contains("NODISPLAY")) {
+				idea_pic.remove(idea_pic.get(i));
 			}
-			count++;
 		}
+		for (Idea i : ideas) {
+			if (i.getTag().equals("DISPLAY")) {
+				idea_pic.add(i.getContent());
+			}
+		}
+		int tmp = (int) (Math.random() * idea_pic.size());
+
+		if (!idea_pic.get(tmp).endsWith("png")) {
+			for (Idea idea : ideas) {
+				if (idea.toString().contains(idea_pic.get(tmp))) {
+					currentmind = idea;
+					break;
+				}
+			}
+
+		}
+
+		if (!Utils.tiponwindow.equals("true")) {
+			MainFrame.showToast("使用CTRL+SHIFT+X热键查看详情", idea_pic.get(tmp).replace("*#&", "\n"), MessageType.INFO);
+			return;
+		} else {
+			MainFrame.ideaFloatFrame.updateTip(idea_pic.get(tmp));
+			MainFrame.ideaFloatFrame.invalidate();
+		}
+
 	}
 
 	JPanel contentPane;
-
 
 	private IdeaFrame() {
 
 		setTitle("速记列表");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 876, 675);
+		Toolkit kit = Toolkit.getDefaultToolkit(); // 定义工具包
+		Dimension screenSize = kit.getScreenSize(); // 获取屏幕的尺寸
+		int screenWidth = screenSize.width / 2; // 获取屏幕的宽
+		int screenHeight = screenSize.height / 2; // 获取屏幕的高
+
+		int height = this.getHeight();
+		int width = this.getWidth();
+		setLocation(screenWidth - width / 2, screenHeight - height / 2);
 
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
 		toolkit.addAWTEventListener(new AWTEventListener() {
@@ -135,9 +123,9 @@ public class IdeaFrame extends JFrame implements Runnable {
 		try {
 			remove(contentPane);
 		} catch (Exception e) {
-
+			
 		}
-		ArrayList<String> ideafiles = Utils.getFiles(MainGuardFrame.filePath + "\\" + "idea");
+		ArrayList<String> ideafiles = Utils.getFiles(MainFrame.filePath + "\\" + "idea");
 
 		ArrayList<Mind> minds = new ArrayList<Mind>();
 		for (String ideafile : ideafiles) {
@@ -156,7 +144,7 @@ public class IdeaFrame extends JFrame implements Runnable {
 
 				tabledata.add(row);
 			} catch (Exception e) {
-
+				e.printStackTrace();
 			}
 
 		}
@@ -200,23 +188,25 @@ public class IdeaFrame extends JFrame implements Runnable {
 
 		while (true) {
 			if (Utils.randomideashow.equals("true")) {
-				while (Notifier.iswatching) {
-					ideas = getIdeas(mindpath);
+				while (PlanNotifier.iswatching) {
+					ideas = MainFrame.ioUtils.getIdeaslist();
+
 					try {
+						showIdea();
 						if (Integer.parseInt(Utils.nextideashow) > 0) {
 							Thread.sleep(Integer.parseInt(Utils.nextideashow) * 60000);
 						} else {
 							Thread.sleep((long) (((Math.random() * 0.5 + 0.1) * 6000000)));
 						}
-						showIdea();
+
 					} catch (Exception e) {
 						try {
 							Thread.sleep(60000);
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
 						}
-						 MainGuardFrame.showToast("警告",
-						 "请检查控制idea回顾的参数是否合法",MessageType.ERROR);
+
+						MainFrame.showToast("警告", "请检查控制idea回顾的参数是否合法", MessageType.ERROR);
 					}
 				}
 			}

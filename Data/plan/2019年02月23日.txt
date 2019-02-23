@@ -1,0 +1,6 @@
+[time]08:46[time] [task]完成工具的最终版[task] [detail][detail] [args][args] [finish][finish]
+
+[time]09:25[time] [task]1111[task] [detail][detail] [args][args] [finish][finish]
+
+[time]17:00[time] [task]问老婆晚上回不回去[task] [detail][detail] [args][args] [finish][finish]
+

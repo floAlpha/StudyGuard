@@ -74,7 +74,7 @@ public class IdeaInputFrame extends JFrame {
 		
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				IdeaFrame.storeIdea(textArea.getText());
+				MainFrame.ioUtils.storeIdea(textArea.getText());
 				dispose();
 			}
 		});

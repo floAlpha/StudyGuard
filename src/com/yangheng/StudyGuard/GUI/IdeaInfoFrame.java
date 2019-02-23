@@ -1,17 +1,15 @@
 package com.yangheng.StudyGuard.GUI;
 
 import java.awt.AWTEvent;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -28,17 +26,19 @@ public class IdeaInfoFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextArea textArea;
+	private static JTextArea textArea;
 	public static IdeaInfoFrame instance = null; // 实现阻止程序多次启动
 	private JScrollPane scrollPane_1;
-
+	static public Idea idea;
+	
 	public static IdeaInfoFrame getInstance(Idea idea) {
-
+		IdeaInfoFrame.idea=idea;
 		if (instance == null) {
 			synchronized (IdeaInfoFrame.class) {
 				if (instance == null) {
-					if (!(idea == null)) {
-						instance = new IdeaInfoFrame(idea);
+					if (!(IdeaInfoFrame.idea == null)) {
+						instance = new IdeaInfoFrame();
+						IdeaInfoFrame.idea = idea;
 					}
 				}
 			}
@@ -46,35 +46,57 @@ public class IdeaInfoFrame extends JFrame {
 		return instance;
 	}
 
-	private IdeaInfoFrame(Idea idea) {
+	private static void updateIdea(Idea idea) {
+		ArrayList<String> ideas = MainFrame.ioUtils.getIdeaslist();
+
+		for (int i = 0; i < ideas.size(); i++)
+
+		{
+			if (Utils.getValueOfElementByTag(ideas.get(i), "[content]").equals(idea.getContent())) {
+				idea.setContent(textArea.getText().replace("\n", "hh"));
+				ideas.set(ideas.indexOf(ideas.get(i)), idea.toString());
+
+			}
+		}
+
+	}
+	
+	public static void disableDisplay(String content) {
+		
+		for (int i = 0; i < MainFrame.ioUtils.getIdeaslist().size(); i++) {
+			if (Utils.getValueOfElementByTag(MainFrame.ioUtils.getIdeaslist().get(i), "[content]").equals(content)) {
+				
+				MainFrame.ioUtils.getIdeaslist().set(i, MainFrame.ioUtils.getIdeaslist().get(i).replace("DISPLAY", "NODISPLAY"));
+				// ideas.remove(ideas.get(i));
+				// ideas.add(ideas.get(i).replace("DISPLAY", "NODISPLAY"));
+			}
+		}
+//		updateIdea(idea);
+	}
+
+	private IdeaInfoFrame() {
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 555, 420);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 
+		Toolkit kit = Toolkit.getDefaultToolkit(); // 定义工具包
+		Dimension screenSize = kit.getScreenSize(); // 获取屏幕的尺寸
+		int screenWidth = screenSize.width / 2; // 获取屏幕的宽
+		int screenHeight = screenSize.height / 2; // 获取屏幕的高
+
+		int height = this.getHeight();
+		int width = this.getWidth();
+		setLocation(screenWidth - width / 2, screenHeight - height / 2);
+
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				ArrayList<String> ideas = Utils
-						.readTxtFileIntoStringArrList(MainGuardFrame.filePath + "\\idea\\idea.txt");
-				for (int i = 0; i < ideas.size(); i++) {
-					if (Utils.getValueOfElementByTag(ideas.get(i), "[content]").equals(idea.getContent())) {
-						idea.setContent(textArea.getText());
-						ideas.set(ideas.indexOf(ideas.get(i)), idea.toString());
-						try {
-							File file = new File(MainGuardFrame.filePath + "\\idea\\idea.txt");
-							if (file.exists()) {
-								file.delete();
-							}
-							Utils.writeObjectsToFile(ideas, MainGuardFrame.filePath + "\\idea\\idea.txt");
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-						dispose();
-					}
-				}
 
+				updateIdea(idea);
+				dispose();
 			}
 		});
 
@@ -86,7 +108,6 @@ public class IdeaInfoFrame extends JFrame {
 					KeyEvent evt = (KeyEvent) e;
 					if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						dispose();
-
 					}
 				}
 			}
@@ -106,8 +127,6 @@ public class IdeaInfoFrame extends JFrame {
 		scrollPane_1.setBounds(24, 10, 500, 308);
 		textArea.setColumns(10);
 		textArea.setText(idea.getContent());
-		// setTitle("Idea - <dynamic>
-		// (\u6240\u505A\u7684\u4FEE\u6539\u5C06\u4F1A\u88AB\u4FDD\u5B58)");
 		contentPane.setLayout(null);
 		contentPane.add(scrollPane_1);
 
@@ -115,40 +134,23 @@ public class IdeaInfoFrame extends JFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				ArrayList<String> newidea = new ArrayList<String>();
-				idea.setTag("NODISPLAY");
-				// System.out.println(IdeaFrame.ideas);
-				for (Idea i : IdeaFrame.ideas) {
-					if (idea.getTime().equals(i.getTime())) {
-						i.setTag(idea.getTag());
-					}
-					newidea.add(i.toString());
-				}
-
-				try {
-					File file = new File(MainGuardFrame.filePath + "\\idea\\idea.txt");
-					if (file.exists()) {
-						file.delete();
-					}
-					Utils.writeObjectsToFile(newidea, MainGuardFrame.filePath + "\\idea\\idea.txt");
-					dispose();
-				} catch (IOException e1) {
-					MainGuardFrame.showToast("错误", "标记不再显示出错", MessageType.ERROR);
-					e1.printStackTrace();
-				}
+				disableDisplay(idea.getContent());
+				updateIdea(new Idea(idea.toString().replace("DISPLAY", "NODISPLAY")));
+				dispose();
 			}
 		});
 		btnNewButton.setFont(new Font("楷体", Font.PLAIN, 16));
 		btnNewButton.setBounds(188, 342, 148, 23);
 		contentPane.add(btnNewButton);
-		invalidate();
+		// invalidate();
 	}
 
 	public void updateView(Idea idea) {
-		textArea.setText(idea.getContent());
+		IdeaInfoFrame.idea=idea;
+		setTitle("速记回顾 " + idea.getTime() + " 任何修改都会被保存");
+		textArea.setText(idea.getContent().replace("hh", "\n"));
+//		content = idea.getContent();
 		invalidate();
 	}
-
-
 
 }

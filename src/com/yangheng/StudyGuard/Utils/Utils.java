@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import com.yangheng.StudyGuard.GUI.MainGuardFrame;
+import com.yangheng.StudyGuard.GUI.MainFrame;
 
 public class Utils {
 	public static String pausequery;
@@ -26,10 +26,11 @@ public class Utils {
 	public static String nomainwindow;
 	public static String nextideashow;
 	public static String randomideashow;
-	public static String askfordoing;
+//	public static String askfordoing;
+	public static String tiponwindow;
 
 	public static void loadConfig() {
-		ArrayList<String> configs = Utils.readTxtFileIntoStringArrList(MainGuardFrame.filePath + "/conf/conf.txt");
+		ArrayList<String> configs = Utils.readTxtFileIntoStringArrList(MainFrame.filePath + "/conf/conf.txt");
 		try {
 
 			for (String string : configs) {
@@ -38,53 +39,60 @@ public class Utils {
 					if (Utils.getValueOfElementByTag(s, "[pausequery]") != null
 							&& !Utils.getValueOfElementByTag(s, "[pausequery]").equals("")) {
 						if ((pausequery = Utils.getValueOfElementByTag(s, "[pausequery]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[pausequery]配置参数错误:" + pausequery, MessageType.ERROR);
+							MainFrame.showToast("错误", "[pausequery]配置参数错误:" + pausequery, MessageType.ERROR);
 						}
 					}
 					if (Utils.getValueOfElementByTag(s, "[startquery]") != null
 							&& !Utils.getValueOfElementByTag(s, "[startquery]").equals("")) {
 						if ((startquery = Utils.getValueOfElementByTag(s, "[startquery]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[startquery]配置参数错误:" + startquery, MessageType.ERROR);
+							MainFrame.showToast("错误", "[startquery]配置参数错误:" + startquery, MessageType.ERROR);
 						}
 					}
 					if (Utils.getValueOfElementByTag(s, "[dailysumtime]") != null
 							&& !Utils.getValueOfElementByTag(s, "[dailysumtime]").equals("")) {
 						if ((dailysumtime = Utils.getValueOfElementByTag(s, "[dailysumtime]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[dailysumtime]配置参数错误:" + dailysumtime, MessageType.ERROR);
+							MainFrame.showToast("错误", "[dailysumtime]配置参数错误:" + dailysumtime, MessageType.ERROR);
 						}
 					}
 					if (Utils.getValueOfElementByTag(s, "[cascadedelay]") != null
 							&& !Utils.getValueOfElementByTag(s, "[cascadedelay]").equals("")) {
 						if ((cascadedelay = Utils.getValueOfElementByTag(s, "[cascadedelay]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[startquery]配置参数错误:" + cascadedelay, MessageType.ERROR);
+							MainFrame.showToast("错误", "[startquery]配置参数错误:" + cascadedelay, MessageType.ERROR);
 						}
 					}
 					if (Utils.getValueOfElementByTag(s, "[nomainwindow]") != null
 							&& !Utils.getValueOfElementByTag(s, "[nomainwindow]").equals("")) {
 						if ((nomainwindow = Utils.getValueOfElementByTag(s, "[nomainwindow]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[nomainwindow]配置参数错误:" + nomainwindow, MessageType.ERROR);
+							MainFrame.showToast("错误", "[nomainwindow]配置参数错误:" + nomainwindow, MessageType.ERROR);
 						}
 					}
 					if (Utils.getValueOfElementByTag(s, "[randomideashow]") != null
 							&& !Utils.getValueOfElementByTag(s, "[randomideashow]").equals("")) {
 						if ((randomideashow = Utils.getValueOfElementByTag(s, "[randomideashow]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[randomideashow]配置参数错误:" + randomideashow,
+							MainFrame.showToast("错误", "[randomideashow]配置参数错误:" + randomideashow,
 									MessageType.ERROR);
 						}
 					}
 					if (Utils.getValueOfElementByTag(s, "[nextideashow]") != null
 							&& !Utils.getValueOfElementByTag(s, "[nextideashow]").equals("")) {
 						if ((nextideashow = Utils.getValueOfElementByTag(s, "[nextideashow]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[nextideashow]配置参数错误:" + nextideashow, MessageType.ERROR);
+							MainFrame.showToast("错误", "[nextideashow]配置参数错误:" + nextideashow, MessageType.ERROR);
 						}
 					}
-					if (Utils.getValueOfElementByTag(s, "[askfordoing]") != null
-							&& !Utils.getValueOfElementByTag(s, "[askfordoing]").equals("")) {
-						if ((askfordoing = Utils.getValueOfElementByTag(s, "[askfordoing]")).equals("")) {
-							MainGuardFrame.showToast("错误", "[askfordoing]配置参数错误:" + askfordoing, MessageType.ERROR);
+//					if (Utils.getValueOfElementByTag(s, "[askfordoing]") != null
+//							&& !Utils.getValueOfElementByTag(s, "[askfordoing]").equals("")) {
+//						if ((askfordoing = Utils.getValueOfElementByTag(s, "[askfordoing]")).equals("")) {
+//							MainFrame.showToast("错误", "[askfordoing]配置参数错误:" + askfordoing, MessageType.ERROR);
+//						}
+//					}
+					if (Utils.getValueOfElementByTag(s, "[tiponwindow]") != null
+							&& !Utils.getValueOfElementByTag(s, "[tiponwindow]").equals("")) {
+						if ((tiponwindow = Utils.getValueOfElementByTag(s, "[tiponwindow]")).equals("")) {
+							MainFrame.showToast("错误", "[tiponwindow]配置参数错误:" + tiponwindow, MessageType.ERROR);
 						}
 					}
 				}
+
 			}
 
 		} catch (Exception e) {
@@ -171,7 +179,7 @@ public class Utils {
 	}
 
 	public static void writeObjectsToFile(ArrayList<String> objects, String path) throws IOException {
-		System.out.println(path);
+		// System.out.println(path);
 		File file = new File(path);
 		// 如果没有文件就创建
 		if (!file.isFile()) {
@@ -187,7 +195,6 @@ public class Utils {
 				} else {
 					return 1;
 				}
-
 			}
 		});
 		BufferedWriter out = null;
@@ -198,6 +205,7 @@ public class Utils {
 			}
 
 		} catch (Exception e) {
+			MainFrame.showToast("错误", "写入文件" + path + "失败，请检查文件是否存在", MessageType.ERROR);
 			e.printStackTrace();
 		} finally {
 			try {
@@ -207,7 +215,6 @@ public class Utils {
 			}
 		}
 	}
-	
 
 	public static String getTime() {
 
@@ -244,9 +251,6 @@ public class Utils {
 		try {
 			int begin = item.indexOf(name);
 			int end = item.substring(begin + 1).indexOf(name);
-//			System.out.println(item);
-//			 System.out.println(item.substring(begin + name.length(), begin +
-//			 end + 1));
 			return item.substring(begin + name.length(), begin + end + 1);
 		} catch (Exception e) {
 

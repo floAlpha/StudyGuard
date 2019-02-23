@@ -20,7 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.yangheng.StudyGuard.Notifier;
+import com.yangheng.StudyGuard.PlanNotifier;
 import com.yangheng.StudyGuard.Object.Memorandum;
 import com.yangheng.StudyGuard.Utils.Utils;
 
@@ -74,7 +74,7 @@ public class MemorandumFrame extends JFrame implements Runnable {
 				}
 			}
 		} catch (Exception formatException) {
-			MainGuardFrame.showToast("错误", "备忘录时间格式有误", MessageType.ERROR);
+			MainFrame.showToast("错误", "备忘录时间格式有误", MessageType.ERROR);
 		}
 
 	}
@@ -222,8 +222,8 @@ public class MemorandumFrame extends JFrame implements Runnable {
 		openmemorandum.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Runtime.getRuntime().exec(
-							("explorer " + MainGuardFrame.filePath + "/memorandum/memorandum.txt").replace('/', '\\'));
+					Runtime.getRuntime()
+							.exec(("explorer " + MainFrame.filePath + "/memorandum/memorandum.txt").replace('/', '\\'));
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -239,16 +239,27 @@ public class MemorandumFrame extends JFrame implements Runnable {
 	}
 
 	public static void showMemorandum() {
-		ArrayList<String> memorandums = Utils.readTxtFileIntoStringArrList(
-				(MainGuardFrame.filePath + "/memorandum/memorandum.txt").replace('/', '\\'));
-		for (String string : memorandums) {
-			Memorandum memorandum = new Memorandum(string);
-			if (Utils.getTime().contains(memorandum.getTime())) {
-//				 System.out.println(memorandum.toString());
-				MainGuardFrame.showToast("[备忘录]" + memorandum.getTime(), memorandum.getContent(), MessageType.INFO);
+		try {
+			
+			ArrayList<String> memorandums = MainFrame.ioUtils.getMemolist();
+			for (String string : memorandums) {
+		
+				Memorandum memorandum = new Memorandum(string);
+				System.out.println(Utils.getTime());
+				System.out.println(memorandum.getTime());
+				
+				System.out.println(Utils.getTime().contains(memorandum.getTime()));
+				System.out.println();
+				if (Utils.getTime().contains(memorandum.getTime())) {
+		
+					MainFrame.showToast("[备忘录]" + memorandum.getTime(), memorandum.getContent(), MessageType.INFO);
+				}
 			}
-
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("memo err");
 		}
+
 	}
 
 	public static void takeMemorandum(String time, String content) {
@@ -257,7 +268,7 @@ public class MemorandumFrame extends JFrame implements Runnable {
 			ArrayList<String> arrayList = new ArrayList<String>();
 			arrayList.add(memorandum.toString());
 			try {
-				Utils.writeObjectsToFile(arrayList, MainGuardFrame.filePath + "\\memorandum\\memorandum.txt");
+				Utils.writeObjectsToFile(arrayList, MainFrame.filePath + "\\memorandum\\memorandum.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -270,11 +281,10 @@ public class MemorandumFrame extends JFrame implements Runnable {
 	public void run() {
 
 		while (true) {
-			while (Notifier.iswatching) {
-
-				showMemorandum();
+			while (PlanNotifier.iswatching) {
 
 				try {
+					showMemorandum();
 					Thread.sleep(55000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();

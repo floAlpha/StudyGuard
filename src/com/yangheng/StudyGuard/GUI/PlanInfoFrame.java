@@ -8,8 +8,6 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -19,16 +17,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.yangheng.StudyGuard.Notifier;
+import com.yangheng.StudyGuard.PlanNotifier;
 import com.yangheng.StudyGuard.Object.StudyPlan;
-import com.yangheng.StudyGuard.Utils.Utils;
 
 public class PlanInfoFrame extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
-	public static String studyplanpath;
 
-	public static boolean exist = false;
 
 	private JPanel contentPane;
 
@@ -72,7 +67,7 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 		if (instance == null) {
 			synchronized (PlanInfoFrame.class) {
 				if (instance == null) {
-					instance = new PlanInfoFrame(new ArrayList<String>(Notifier.planlist));
+					instance = new PlanInfoFrame();
 					instance.setVisible(true);
 					instance.setAlwaysOnTop(true);
 				}
@@ -84,7 +79,7 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 	/**
 	 * Create the frame.
 	 */
-	public PlanInfoFrame(ArrayList<String> planlist) {
+	public PlanInfoFrame() {
 
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
@@ -108,26 +103,11 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				try {
-					File file = new File(
-							MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
-					if (file.exists()) {
-						file.delete();
-					}
-					Utils.writeObjectsToFile(planlist,
-							MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
-					exist = false;
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				MainFrame.ioUtils.updateStudyPlan();
+				
 			}
 		});
 
-		if (exist) {
-			this.dispose();
-		} else {
-			exist = true;
-		}
 
 		setTitle("\u5B66\u4E60\u8BA1\u5212");
 		setBounds(100, 100, 525, 481);
@@ -373,8 +353,8 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 		
 		while (true) {
 			
-			for (int i = 0; i < Notifier.planlist.size(); i++) {
-				StudyPlan sp = new StudyPlan(Notifier.planlist.get(i));
+			for (int i = 0; i < PlanNotifier.planlist.size(); i++) {
+				StudyPlan sp = new StudyPlan(PlanNotifier.planlist.get(i));
 				tasks.get(i).setText(sp.getTask());
 				labels.get(i).setText(sp.getTime());
 				labels_finish.get(i).setText(sp.getFinish());

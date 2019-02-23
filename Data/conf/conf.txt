@@ -3,6 +3,6 @@
 [dailysumtime]22:00[dailysumtime] [detail]生成每日学习报告时间，必须在当天00:00之前
 [cascadedelay]true[cascadedelay] [detail]推迟一个任务，当天该任务之后的任务是否级联推迟
 [nomainwindow]false[nomainwindow] [detail]无主界面启动，程序常驻后台
-[nextideashow]10[nextideashow] [detail]显示idea的时间间隔，时间单位分钟，设置为0则随机出现下一条idea回顾
+[nextideashow]1[nextideashow] [detail]显示idea的时间间隔，时间单位分钟，设置为0则随机出现下一条idea回顾
 [randomideashow]true[randomideashow] [detail]随机回顾记录的idea
-[askfordoing]true[askfordoing] [detail]开启随机询问学习情况[detail]
+[tiponwindow]true[tiponwindow] [detail]使用悬浮窗显示速记，false则使用通知显示[detail]

@@ -1,7 +1,6 @@
 package com.yangheng.StudyGuard;
 
 import java.awt.TrayIcon.MessageType;
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,27 +11,22 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import com.yangheng.StudyGuard.GUI.MainGuardFrame;
+import com.yangheng.StudyGuard.GUI.MainFrame;
 import com.yangheng.StudyGuard.GUI.PlanInfoFrame;
 import com.yangheng.StudyGuard.Object.StudyPlan;
 import com.yangheng.StudyGuard.Utils.Utils;
 
-public class Notifier extends Thread {
+public class PlanNotifier extends Thread {
 
 	public static ArrayList<String> planlist;
-	public static boolean isalive = false;
+	public static boolean isalive = true;
 	public static boolean iswatching = true;
 
-	public Notifier(ArrayList<String> planlist) {
-		super();
-		isalive = true;
-		Notifier.planlist = planlist;
-	}
 
-	public static void dailySum() {
+	public static void dailyPlanSum() {
 		if (Utils.getTime().substring(12, 17).equals(Utils.dailysumtime)) {
 			ArrayList<String> dailyitems = Utils.readTxtFileIntoStringArrList(
-					MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
+					MainFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
 			double finished = 0;
 			try {
 				for (String s : dailyitems) {
@@ -42,16 +36,16 @@ public class Notifier extends Thread {
 					}
 					// System.out.println(s);
 					Utils.writeToFileByRow(s,
-							MainGuardFrame.filePath + "\\dailyplan\\" + Utils.getTime().substring(0, 11) + ".txt");
+							MainFrame.filePath + "\\dailyplan\\" + Utils.getTime().substring(0, 11) + ".txt");
 				}
 				String dailysum = JOptionPane.showInputDialog(null, "请输入今日工作总结：");
 				if (((String) dailysum).equals("")) {
 					return;
 				}
 				Utils.writeToFileByRow("[全天任务完成度（不包括已取消任务）]" + (finished / dailyitems.size()) * 100 + "%",
-						MainGuardFrame.filePath + "\\dailyplan\\" + Utils.getTime().substring(0, 11) + ".txt");
+						MainFrame.filePath + "\\dailyplan\\" + Utils.getTime().substring(0, 11) + ".txt");
 				Utils.writeToFileByRow("[今日任务总结]" + dailysum,
-						MainGuardFrame.filePath + "\\dailyplan\\" + Utils.getTime().substring(0, 11) + ".txt");
+						MainFrame.filePath + "\\dailyplan\\" + Utils.getTime().substring(0, 11) + ".txt");
 				java.awt.Toolkit.getDefaultToolkit().beep();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -65,26 +59,23 @@ public class Notifier extends Thread {
 		while (true) {
 
 			while (iswatching) {
-				Utils.loadConfig();
+//				Utils.loadConfig();
 				if (Utils.getTime().substring(12, 17).equals(Utils.pausequery)) {
-
 					try {
 						SimpleDateFormat simpleFormat = new SimpleDateFormat("hh:mm");
 						Date pauseTime = simpleFormat.parse(Utils.pausequery);
 						Date startTime = simpleFormat.parse(Utils.startquery);
-						Watcher.iswatching = false;
-						MainGuardFrame.showToast("通知", "关闭学习情况询问", MessageType.INFO);
-
+						MainFrame.showToast("通知", "关闭学习情况询问", MessageType.INFO);
 						sleep(Math.abs((startTime.getTime() - pauseTime.getTime())));
-						Watcher.iswatching = true;
-						MainGuardFrame.showToast("通知", "关闭学习情况询问", MessageType.INFO);
+						MainFrame.showToast("通知", "关闭学习情况询问", MessageType.INFO);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 
-				Watcher.load_study_plan();
-
+//				Watcher.load_study_plan();
+				planlist=MainFrame.ioUtils.getPlanlist();
+//				System.out.println(planlist);
 				for (int i = 0; i < planlist.size(); i++) {
 					String string = planlist.get(i);
 					StudyPlan sp = new StudyPlan(string);
@@ -159,10 +150,10 @@ public class Notifier extends Thread {
 								e.printStackTrace();
 							}
 						}
-						File file = new File(MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11));
-						if (file.exists()) {
-							file.delete();
-						}
+//						File file = new File(MainFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11));
+//						if (file.exists()) {
+//							file.delete();
+//						}
 						PlanInfoFrame planInfoFrame = PlanInfoFrame.getInstance();
 						planInfoFrame.setVisible(true);
 						new Thread(planInfoFrame).start();
@@ -183,7 +174,7 @@ public class Notifier extends Thread {
 					}
 				});
 
-				dailySum();// 生成每日学习计划总结
+				dailyPlanSum();// 生成每日学习计划总结
 				try {
 					sleep(55000);
 				} catch (InterruptedException e) {

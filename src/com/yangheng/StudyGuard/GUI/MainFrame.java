@@ -21,6 +21,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -29,34 +30,36 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.FontUIResource;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
-import com.yangheng.StudyGuard.Notifier;
+import com.yangheng.StudyGuard.PlanNotifier;
 import com.yangheng.StudyGuard.SingleInstance;
-import com.yangheng.StudyGuard.Watcher;
+import com.yangheng.StudyGuard.Utils.IOUtils;
 import com.yangheng.StudyGuard.Utils.Utils;
 
 /**
  * @author chuan
  *
  */
-public class MainGuardFrame extends JFrame implements Runnable {
+public class MainFrame extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	public static String filePath;
-	// public static String studyPlanPath;
-	Watcher watcher;
 
+	public static String filePath;
+	public static IOUtils ioUtils;
+	static IdeaFloatFrame ideaFloatFrame = IdeaFloatFrame.getInstance();
+	TipFrame tipFrame = TipFrame.getInstance();
 	public static SystemTray systemTray;// 系统托盘
 	public static TrayIcon trayIcon;// 托盘图标
 
-	static String realPath = "./";
+	String realPath = "./";
 
 	public static String getAppPath() {
 		// 获取jar文件当前执行路径
-		String apppath = MainGuardFrame.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		String apppath = MainFrame.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 		String realPath = "./";
 		try {
 			realPath = java.net.URLDecoder.decode(apppath, "utf-8");
@@ -64,7 +67,7 @@ public class MainGuardFrame extends JFrame implements Runnable {
 			realPath = realPath.substring(1, realPath.length());
 
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		return realPath;
 	}
@@ -78,18 +81,40 @@ public class MainGuardFrame extends JFrame implements Runnable {
 		trayIcon.displayMessage(title, message, messageType);
 
 	}
+	
+	private static void initGlobalFont(){
+
+	    FontUIResource fontUIResource = new FontUIResource(new Font("黑体",Font.PLAIN, 12));
+
+	    for (@SuppressWarnings("rawtypes")
+		Enumeration keys = UIManager.getDefaults().keys(); keys.hasMoreElements();) {
+
+	        Object key = keys.nextElement();
+
+	        Object value= UIManager.get(key);
+
+	        if (value instanceof FontUIResource) {
+
+	            UIManager.put(key, fontUIResource);
+
+	        }  
+
+	    }
+
+	}
 
 	public static void main(String[] args) {
 
-		MainGuardFrame mainframe = MainGuardFrame.getInstance();
+		MainFrame mainframe = MainFrame.getInstance();
 		new Thread(mainframe).start();
 	}
 
-	private static MainGuardFrame instance = null;
+	private static MainFrame instance = null;
 
 	// 实现阻止程序多次启动
-	public static MainGuardFrame getInstance() {
-		MainGuardFrame.filePath = getAppPath() + "/Data/";
+	public static MainFrame getInstance() {
+		initGlobalFont();
+		MainFrame.filePath = getAppPath() + "/Data/";
 		try {
 			systemTray = SystemTray.getSystemTray();
 			Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
@@ -106,11 +131,11 @@ public class MainGuardFrame extends JFrame implements Runnable {
 		Utils.loadConfig();
 		// System.out.println("第一次加载");
 		if (instance == null) {
-			synchronized (MainGuardFrame.class) {
+			synchronized (MainFrame.class) {
 				if (instance == null) {
 
-					instance = new MainGuardFrame();
-					MainGuardFrame.showToast("提示", "软件正在后台运行", MessageType.INFO);
+					instance = new MainFrame();
+					MainFrame.showToast("提示", "软件正在后台运行", MessageType.INFO);
 					try {
 						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					} catch (Exception e) {
@@ -132,7 +157,7 @@ public class MainGuardFrame extends JFrame implements Runnable {
 		return instance;
 	}
 
-	private MainGuardFrame() {
+	private MainFrame() {
 
 		trayIcon.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -147,9 +172,7 @@ public class MainGuardFrame extends JFrame implements Runnable {
 						ideaInfo.setAlwaysOnTop(true);
 						ideaInfo.setVisible(true);
 					}
-
 				}
-
 			}
 
 		});
@@ -176,7 +199,6 @@ public class MainGuardFrame extends JFrame implements Runnable {
 					KeyEvent evt = (KeyEvent) e;
 					if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						dispose();
-
 					}
 				}
 			}
@@ -184,16 +206,7 @@ public class MainGuardFrame extends JFrame implements Runnable {
 
 		// this.setExtendedState(JFrame.ICONIFIED);
 
-		Toolkit kit = Toolkit.getDefaultToolkit(); // 定义工具包
-		Dimension screenSize = kit.getScreenSize(); // 获取屏幕的尺寸
-		int screenWidth = screenSize.width / 2; // 获取屏幕的宽
-		int screenHeight = screenSize.height / 2; // 获取屏幕的高
-
-		int height = this.getHeight();
-		int width = this.getWidth();
-		setLocation(screenWidth - width / 2, screenHeight - height / 2);
-
-		setTitle("学习助手 V1.0" + "(正在守护)");
+		setTitle("速记工具  V1.1");
 		Toolkit tool = getToolkit(); // 得到一个Toolkit对象
 		Image image = tool.getImage(realPath + "src/icon.png");
 		setIconImage(image);
@@ -207,19 +220,27 @@ public class MainGuardFrame extends JFrame implements Runnable {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		Toolkit kit = Toolkit.getDefaultToolkit(); // 定义工具包
+		Dimension screenSize = kit.getScreenSize(); // 获取屏幕的尺寸
+		int screenWidth = screenSize.width / 2; // 获取屏幕的宽
+		int screenHeight = screenSize.height / 2; // 获取屏幕的高
 
-		JButton pausewatch = new JButton("\u6682\u505C\u76D1\u63A7(F3)");
+		int height = this.getHeight();
+		int width = this.getWidth();
+		setLocation(screenWidth - width / 2, screenHeight - height / 2);
+
+		JButton pausewatch = new JButton("\u65B0\u5EFA\u4EFB\u52A1(F3)");
 		pausewatch.setFont(new Font("楷体", Font.BOLD, 18));
 		pausewatch.setBounds(35, 33, 173, 37);
 		contentPane.add(pausewatch);
 
-		JButton satrtwatch = new JButton("\u6062\u590D\u76D1\u63A7(F4)");
+		JButton satrtwatch = new JButton("\u5DE5\u4F5C\u76EE\u5F55(F4)");
 
 		satrtwatch.setFont(new Font("楷体", Font.BOLD, 18));
-		satrtwatch.setBounds(277, 33, 173, 37);
+		satrtwatch.setBounds(277, 80, 173, 37);
 		contentPane.add(satrtwatch);
 
-		JButton openplanfile = new JButton("\u6253\u5F00\u8BA1\u5212(F5)");
+		JButton openplanfile = new JButton("\u6253\u5F00\u4EFB\u52A1(F5)");
 		openplanfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showToast("提示", "使用CTRL+SHIFT+Z热键创建当日新计划条目", MessageType.INFO);
@@ -234,7 +255,7 @@ public class MainGuardFrame extends JFrame implements Runnable {
 		});
 
 		openplanfile.setFont(new Font("楷体", Font.BOLD, 18));
-		openplanfile.setBounds(35, 80, 173, 38);
+		openplanfile.setBounds(277, 32, 173, 38);
 		contentPane.add(openplanfile);
 
 		JSeparator separator = new JSeparator();
@@ -268,31 +289,37 @@ public class MainGuardFrame extends JFrame implements Runnable {
 
 		pausewatch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// MindFrame.storeMind();
-				Notifier.iswatching = false;
-				Watcher.iswatching = false;
-				setTitle("学习助手 V1.0" + "(暂停运行)");
-				showToast("通知", "现在起暂停监控", MessageType.INFO);
+				
+				PlanInputFrame planInputFrame = new PlanInputFrame();
+				planInputFrame.setVisible(true);
+				planInputFrame.setAlwaysOnTop(true);
+//				// MindFrame.storeMind();
+//				PlanNotifier.iswatching = false;
+//
+//				setTitle("速记工具 V1.1" + "(暂停运行)");
+//				showToast("通知", "现在起暂停监控", MessageType.INFO);
 			}
 		});
 
 		satrtwatch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Notifier.iswatching = true;
-				Watcher.iswatching = true;
-				setTitle("学习助手 V1.0" + "(正在守护)");
-				showToast("通知", "现在起恢复监控", MessageType.INFO);
-
+				Runtime runtime = Runtime.getRuntime();
+				try {
+					runtime.exec(("explorer " + filePath).replace('/', '\\'));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+//				PlanNotifier.iswatching = true;
+//
+//				setTitle("速记工具 V1.1" + "(正在守护)");
+//				showToast("通知", "现在起恢复监控", MessageType.INFO);
 			}
 		});
 
 		filePath = realPath + "Data";
-		// studyPlanPath = filePath + "/plan/学习计划.txt";
 
-		watcher = new Watcher(filePath,
-				MainGuardFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
-		Watcher.load_study_plan();
-		watcher.start();
+		ioUtils = new IOUtils(filePath);
+		ioUtils.start();
 
 		JButton btnf = new JButton("\u914D\u7F6E\u6587\u4EF6(F6)");
 		btnf.addActionListener(new ActionListener() {
@@ -303,14 +330,27 @@ public class MainGuardFrame extends JFrame implements Runnable {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-
 			}
 		});
 		btnf.setFont(new Font("楷体", Font.BOLD, 18));
-		btnf.setBounds(277, 80, 173, 38);
+		btnf.setBounds(35, 80, 173, 38);
 		contentPane.add(btnf);
+
+		
+		
 		new Thread(IdeaFrame.getInstance()).start();
 		new Thread(new MemorandumFrame()).start();
+		new Thread(new TipFrame()).start();	
+		TipFrame tipFrame= new TipFrame();
+		tipFrame.setVisible(true);
+		tipFrame.setAlwaysOnTop(true);
+		new Thread(tipFrame).start();
+		new Thread(new PlanNotifier()).start();
+
+		
+		ideaFloatFrame.setAlwaysOnTop(true);
+		ideaFloatFrame.setVisible(true);
+
 
 		try {
 			JIntellitype.setLibraryLocation(realPath + "\\JIntellitype64.dll");
@@ -320,9 +360,7 @@ public class MainGuardFrame extends JFrame implements Runnable {
 			dispose();
 			JIntellitype.setLibraryLocation(realPath + "\\JIntellitype.dll");
 		}
-
 		// 热键标识
-
 		final int GLOBAL_HOT_KEY_1 = 1;
 		final int GLOBAL_HOT_KEY_2 = 2;
 		final int GLOBAL_HOT_KEY_3 = 3;
@@ -354,16 +392,24 @@ public class MainGuardFrame extends JFrame implements Runnable {
 					new IdeaInputFrame().setVisible(true);
 					break;
 				case GLOBAL_HOT_KEY_3:
-					Notifier.iswatching = false;
-					Watcher.iswatching = false;
-					setTitle("学习助手 V1.0" + "(正在守护)");
-					showToast("通知", "现在起暂停监控", MessageType.INFO);
+					PlanInputFrame planInput = new PlanInputFrame();
+					planInput.setVisible(true);
+					planInput.setAlwaysOnTop(true);
+				
+//					PlanNotifier.iswatching = false;
+//					setTitle("溯及工具 V1.1" + "(正在守护)");
+//					showToast("通知", "现在起暂停监控", MessageType.INFO);
 					break;
 				case GLOBAL_HOT_KEY_4:
-					Notifier.iswatching = true;
-					Watcher.iswatching = true;
-					setTitle("学习助手 V1.0" + "(正在守护)");
-					showToast("通知", "现在起恢复监控", MessageType.INFO);
+					Runtime runtime = Runtime.getRuntime();
+					try {
+						runtime.exec(("explorer " + filePath).replace('/', '\\'));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+//					PlanNotifier.iswatching = true;
+//					setTitle("速记工具 V1.1" + "(正在守护)");
+//					showToast("通知", "现在起恢复监控", MessageType.INFO);
 					break;
 				case GLOBAL_HOT_KEY_2:
 					MemorandumFrame memorandumFrame = MemorandumFrame.getInstance();
@@ -388,9 +434,9 @@ public class MainGuardFrame extends JFrame implements Runnable {
 					break;
 				case GLOBAL_HOT_KEY_7:
 					MindFrame.storeMind();
-
 					break;
 				case GLOBAL_HOT_KEY_8:
+					
 					IdeaInfoFrame ideaInfo = IdeaInfoFrame.getInstance(IdeaFrame.currentmind);
 					ideaInfo.updateView(IdeaFrame.currentmind);
 					if (ideaInfo != null) {
@@ -399,29 +445,26 @@ public class MainGuardFrame extends JFrame implements Runnable {
 					}
 					break;
 				case GLOBAL_HOT_KEY_9:
-
-					PlanInputFrame planInput = new PlanInputFrame();
-					planInput.setVisible(true);
-					planInput.setAlwaysOnTop(true);
+					PlanInputFrame planInputFrame = new PlanInputFrame();
+					planInputFrame.setVisible(true);
+					planInputFrame.setAlwaysOnTop(true);
+					
 				}
 			}
 		});
-
 	}
 
 	@Override
 	public void run() {
 		while (true) {
 			try {
-				Thread.sleep(3000);// 5分钟
+				Thread.sleep(300000);// 5分钟
 			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-			ArrayList<String> proverbs = Utils
-					.readTxtFileIntoStringArrList(MainGuardFrame.filePath + "\\proverb\\proverb.txt");
-			MainGuardFrame.trayIcon.setToolTip(proverbs.get(((int) (Math.random() * proverbs.size()))));
-
+			ArrayList<String> proverbs = ioUtils.getProverblist();
+			MainFrame.trayIcon.setToolTip(proverbs.get((int) (Math.random() * proverbs.size())));
 		}
-
 	}
 
 }

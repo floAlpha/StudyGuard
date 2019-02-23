@@ -30,7 +30,7 @@ public class MindFrame extends JFrame implements Runnable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	String mindpath = MainGuardFrame.filePath + "\\idea";
+	String mindpath = MainFrame.filePath + "\\idea";
 	static MindFrame instance = null;
 
 	public static Mind currentmind = null;
@@ -62,7 +62,7 @@ public class MindFrame extends JFrame implements Runnable {
 				ArrayList<String> arrayList = new ArrayList<String>();
 				arrayList.add(mind.toString());
 				Utils.writeObjectsToFile(arrayList,
-						MainGuardFrame.filePath + "\\mind\\mind.txt");
+						MainFrame.filePath + "\\mind\\mind.txt");
 				instance.dispose();
 				instance = new MindFrame();
 				instance.setVisible(true);
@@ -169,7 +169,7 @@ public class MindFrame extends JFrame implements Runnable {
 		} catch (Exception e) {
 
 		}
-		ArrayList<String> ideafiles = Utils.getFiles(MainGuardFrame.filePath + "\\" + "mind");
+		ArrayList<String> ideafiles = Utils.getFiles(MainFrame.filePath + "\\" + "mind");
 
 		ArrayList<Mind> minds = new ArrayList<Mind>();
 		for (String ideafile : ideafiles) {
@@ -232,44 +232,7 @@ public class MindFrame extends JFrame implements Runnable {
 		this.invalidate();
 
 	}
-//
-//	@Override
-//	public void run() {
-//
-//		while (true) {
-//			if (Utils.randomideashow.equals("true")) {
-//				while (Notifier.iswatching) {
-//					try {
-//						if (Integer.parseInt(Utils.nextideashow) > 0) {
-//							Thread.sleep(Integer.parseInt(Utils.nextideashow) * 60000);
-//						} else {
-//							Thread.sleep((long) (((Math.random() * 0.5 + 0.1) * 6000000)));
-//						}
-//
-//						showIdea();
-//
-//					} catch (Exception e) {
-//						System.err.println(Utils.nomainwindow);
-//						try {
-//							Thread.sleep(600000);
-//						} catch (InterruptedException e1) {
-//							e1.printStackTrace();
-//						}
-//						// MainGuardFrame.showToast("警告",
-//						// "请检查控制idea回顾的参数是否合法",MessageType.ERROR);
-//					}
-//				}
-//			}
-//
-//			try {
-//				Thread.sleep(60000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//
-//		}
-//
-//	}
+
 
 	@Override
 	public void run() {
