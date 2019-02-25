@@ -51,10 +51,12 @@ public class MainFrame extends JFrame implements Runnable {
 	public static String filePath;
 	public static IOUtils ioUtils;
 	static IdeaFloatFrame ideaFloatFrame = IdeaFloatFrame.getInstance();
+	static IdeaInfoFrame ideaInfoFrame;
 	TipFrame tipFrame = TipFrame.getInstance();
 	public static SystemTray systemTray;// 系统托盘
 	public static TrayIcon trayIcon;// 托盘图标
 
+	PlanInfoFrame planInfoFrame;
 	String realPath = "./";
 
 	public static String getAppPath() {
@@ -78,7 +80,7 @@ public class MainFrame extends JFrame implements Runnable {
 
 	public static void showToast(String title, String message, MessageType messageType) {
 
-		trayIcon.displayMessage(title, message, messageType);
+		trayIcon.displayMessage("速记助手V1.1", message, messageType);
 
 	}
 	
@@ -113,12 +115,14 @@ public class MainFrame extends JFrame implements Runnable {
 
 	// 实现阻止程序多次启动
 	public static MainFrame getInstance() {
+		
 		initGlobalFont();
+	
 		MainFrame.filePath = getAppPath() + "/Data/";
 		try {
 			systemTray = SystemTray.getSystemTray();
 			Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
-			trayIcon = new TrayIcon(image, "正在运行");
+			trayIcon = new TrayIcon(image, "正在运行\n使用CTRL+SHIFT+Z快捷键开关速记悬浮窗");
 			trayIcon.setImageAutoSize(true);
 			systemTray.add(trayIcon);
 
@@ -129,19 +133,17 @@ public class MainFrame extends JFrame implements Runnable {
 		SingleInstance singleInstance = new SingleInstance();
 		singleInstance.start();
 		Utils.loadConfig();
-		// System.out.println("第一次加载");
 		if (instance == null) {
 			synchronized (MainFrame.class) {
 				if (instance == null) {
 
 					instance = new MainFrame();
-					MainFrame.showToast("提示", "软件正在后台运行", MessageType.INFO);
+					MainFrame.showToast("速记助手v1.1", "软件正在后台运行", MessageType.INFO);
 					try {
 						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					// System.out.println(Utils.nomainwindow);
 					if (Utils.nomainwindow.equals("true")) {
 						instance.setVisible(false);
 						instance.setAlwaysOnTop(false);
@@ -206,7 +208,7 @@ public class MainFrame extends JFrame implements Runnable {
 
 		// this.setExtendedState(JFrame.ICONIFIED);
 
-		setTitle("速记工具  V1.1");
+		setTitle("速记助手  V1.1");
 		Toolkit tool = getToolkit(); // 得到一个Toolkit对象
 		Image image = tool.getImage(realPath + "src/icon.png");
 		setIconImage(image);
@@ -234,23 +236,16 @@ public class MainFrame extends JFrame implements Runnable {
 		pausewatch.setBounds(35, 33, 173, 37);
 		contentPane.add(pausewatch);
 
-		JButton satrtwatch = new JButton("\u5DE5\u4F5C\u76EE\u5F55(F4)");
+		JButton satrtwatch = new JButton("\u5DE5\u4F5C\u76EE\u5F55(F6)");
 
 		satrtwatch.setFont(new Font("楷体", Font.BOLD, 18));
 		satrtwatch.setBounds(277, 80, 173, 37);
 		contentPane.add(satrtwatch);
 
-		JButton openplanfile = new JButton("\u6253\u5F00\u4EFB\u52A1(F5)");
+		JButton openplanfile = new JButton("\u6253\u5F00\u4EFB\u52A1(F4)");
 		openplanfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showToast("提示", "使用CTRL+SHIFT+Z热键创建当日新计划条目", MessageType.INFO);
-				Runtime runtime = Runtime.getRuntime();
-				try {
-					runtime.exec(("explorer " + filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt")
-							.replace('/', '\\'));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				planInfoFrame.setVisible(!planInfoFrame.isVisible());
 			}
 		});
 
@@ -265,7 +260,6 @@ public class MainFrame extends JFrame implements Runnable {
 		JButton takeidea = new JButton("\u65B0\u5EFAIDEA (F1)");
 		takeidea.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// IdeaFrame.storeIdea();
 				new IdeaInputFrame().setVisible(true);
 			}
 		});
@@ -293,11 +287,6 @@ public class MainFrame extends JFrame implements Runnable {
 				PlanInputFrame planInputFrame = new PlanInputFrame();
 				planInputFrame.setVisible(true);
 				planInputFrame.setAlwaysOnTop(true);
-//				// MindFrame.storeMind();
-//				PlanNotifier.iswatching = false;
-//
-//				setTitle("速记工具 V1.1" + "(暂停运行)");
-//				showToast("通知", "现在起暂停监控", MessageType.INFO);
 			}
 		});
 
@@ -309,10 +298,6 @@ public class MainFrame extends JFrame implements Runnable {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-//				PlanNotifier.iswatching = true;
-//
-//				setTitle("速记工具 V1.1" + "(正在守护)");
-//				showToast("通知", "现在起恢复监控", MessageType.INFO);
 			}
 		});
 
@@ -321,7 +306,7 @@ public class MainFrame extends JFrame implements Runnable {
 		ioUtils = new IOUtils(filePath);
 		ioUtils.start();
 
-		JButton btnf = new JButton("\u914D\u7F6E\u6587\u4EF6(F6)");
+		JButton btnf = new JButton("\u914D\u7F6E\u6587\u4EF6(F5)");
 		btnf.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Runtime runtime = Runtime.getRuntime();
@@ -345,12 +330,15 @@ public class MainFrame extends JFrame implements Runnable {
 		tipFrame.setVisible(true);
 		tipFrame.setAlwaysOnTop(true);
 		new Thread(tipFrame).start();
+	
 		new Thread(new PlanNotifier()).start();
-
+		
+		planInfoFrame = PlanInfoFrame.getInstance();
+		planInfoFrame.setVisible(false);
+		new Thread(planInfoFrame).start();
 		
 		ideaFloatFrame.setAlwaysOnTop(true);
 		ideaFloatFrame.setVisible(true);
-
 
 		try {
 			JIntellitype.setLibraryLocation(realPath + "\\JIntellitype64.dll");
@@ -388,67 +376,51 @@ public class MainFrame extends JFrame implements Runnable {
 			public void onHotKey(int markCode) {
 				switch (markCode) {
 				case GLOBAL_HOT_KEY_1:
-					// IdeaFrame.storeIdea();
 					new IdeaInputFrame().setVisible(true);
-					break;
-				case GLOBAL_HOT_KEY_3:
-					PlanInputFrame planInput = new PlanInputFrame();
-					planInput.setVisible(true);
-					planInput.setAlwaysOnTop(true);
-				
-//					PlanNotifier.iswatching = false;
-//					setTitle("溯及工具 V1.1" + "(正在守护)");
-//					showToast("通知", "现在起暂停监控", MessageType.INFO);
-					break;
-				case GLOBAL_HOT_KEY_4:
-					Runtime runtime = Runtime.getRuntime();
-					try {
-						runtime.exec(("explorer " + filePath).replace('/', '\\'));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-//					PlanNotifier.iswatching = true;
-//					setTitle("速记工具 V1.1" + "(正在守护)");
-//					showToast("通知", "现在起恢复监控", MessageType.INFO);
 					break;
 				case GLOBAL_HOT_KEY_2:
 					MemorandumFrame memorandumFrame = MemorandumFrame.getInstance();
 					memorandumFrame.setVisible(true);
 					break;
-				case GLOBAL_HOT_KEY_5:
-					showToast("提示", "使用CTRL+SHIFT+Z热键创建当日新计划条目", MessageType.INFO);
-					try {
-						Runtime.getRuntime()
-								.exec(("explorer " + filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt")
-										.replace('/', '\\'));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+				case GLOBAL_HOT_KEY_3:
+					PlanInputFrame planInput = new PlanInputFrame();
+					planInput.setVisible(true);
+					planInput.setAlwaysOnTop(true);
 					break;
-				case GLOBAL_HOT_KEY_6:
+				case GLOBAL_HOT_KEY_4:
+					planInfoFrame.setVisible(!planInfoFrame.isVisible());
+					break;
+				case GLOBAL_HOT_KEY_5:
 					try {
 						Runtime.getRuntime().exec(("explorer " + filePath + "\\conf\\conf.txt").replace('/', '\\'));
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
 					break;
+				case GLOBAL_HOT_KEY_6:
+					Runtime runtime = Runtime.getRuntime();
+					try {
+						runtime.exec(("explorer " + filePath).replace('/', '\\'));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+
+					break;
 				case GLOBAL_HOT_KEY_7:
 					MindFrame.storeMind();
 					break;
 				case GLOBAL_HOT_KEY_8:
-					
-					IdeaInfoFrame ideaInfo = IdeaInfoFrame.getInstance(IdeaFrame.currentmind);
-					ideaInfo.updateView(IdeaFrame.currentmind);
-					if (ideaInfo != null) {
-						ideaInfo.setAlwaysOnTop(true);
-						ideaInfo.setVisible(true);
+
+					ideaInfoFrame = IdeaInfoFrame.getInstance(IdeaFrame.currentmind);
+					ideaInfoFrame.updateView(IdeaFrame.currentmind);
+					if (ideaInfoFrame != null) {
+						ideaInfoFrame.setAlwaysOnTop(true);
+						ideaInfoFrame.setVisible(true);
 					}
 					break;
 				case GLOBAL_HOT_KEY_9:
-					PlanInputFrame planInputFrame = new PlanInputFrame();
-					planInputFrame.setVisible(true);
-					planInputFrame.setAlwaysOnTop(true);
-					
+					ideaFloatFrame.setVisible(!ideaFloatFrame.isVisible());
+					tipFrame.setVisible(!tipFrame.isVisible());
 				}
 			}
 		});

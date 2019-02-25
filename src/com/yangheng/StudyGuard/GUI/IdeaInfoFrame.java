@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -53,7 +54,7 @@ public class IdeaInfoFrame extends JFrame {
 
 		{
 			if (Utils.getValueOfElementByTag(ideas.get(i), "[content]").equals(idea.getContent())) {
-				idea.setContent(textArea.getText().replace("\n", "hh"));
+				idea.setContent(textArea.getText().replace("\n", "[换行]"));
 				ideas.set(ideas.indexOf(ideas.get(i)), idea.toString());
 
 			}
@@ -146,11 +147,19 @@ public class IdeaInfoFrame extends JFrame {
 	}
 
 	public void updateView(Idea idea) {
-		IdeaInfoFrame.idea=idea;
-		setTitle("速记回顾 " + idea.getTime() + " 任何修改都会被保存");
-		textArea.setText(idea.getContent().replace("hh", "\n"));
-//		content = idea.getContent();
-		invalidate();
+		if (idea.toString().contains(".png")) {
+			try {
+				Runtime.getRuntime().exec("explorer "+idea.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else {
+			IdeaInfoFrame.idea=idea;
+			setTitle("速记回顾 " + idea.getTime() + " 任何修改都会被保存");
+			textArea.setText(idea.getContent().replace("[换行]", "\n"));
+			invalidate();
+		}
+		
 	}
 
 }

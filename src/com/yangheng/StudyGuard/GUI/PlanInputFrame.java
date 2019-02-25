@@ -4,12 +4,19 @@ import java.awt.AWTEvent;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -244,6 +251,34 @@ public class PlanInputFrame extends JFrame {
 		label_8.setFont(new Font("楷体", Font.BOLD, 16));
 		label_8.setBounds(21, 72, 34, 19);
 		contentPane.add(label_8);
+
+		new DropTarget(this, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
+			@Override
+			public void drop(DropTargetDropEvent dtde) {
+				try {
+					// 如果拖入的文件格式受支持
+//					if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+						// 接收拖拽来的数据
+						dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+						@SuppressWarnings("unchecked")
+						List<File> list = (List<File>) (dtde.getTransferable()
+								.getTransferData(DataFlavor.javaFileListFlavor));
+						args.setText("");
+						for (File file : list) {
+							args.setText(file.getAbsolutePath());
+
+						}
+						// 指示拖拽操作已完成
+						dtde.dropComplete(true);
+//					} else {
+//						 拒绝拖拽来的数据
+//						dtde.rejectDrop();
+//					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		hour.requestFocus();
 	}

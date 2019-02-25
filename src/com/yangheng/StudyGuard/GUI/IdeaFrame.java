@@ -66,7 +66,7 @@ public class IdeaFrame extends JFrame implements Runnable {
 		}
 		int tmp = (int) (Math.random() * idea_pic.size());
 
-		if (!idea_pic.get(tmp).endsWith("png")) {
+		if (!idea_pic.get(tmp).endsWith(".png")) {
 			for (Idea idea : ideas) {
 				if (idea.toString().contains(idea_pic.get(tmp))) {
 					currentmind = idea;
@@ -77,7 +77,8 @@ public class IdeaFrame extends JFrame implements Runnable {
 		}
 
 		if (!Utils.tiponwindow.equals("true")) {
-			MainFrame.showToast("使用CTRL+SHIFT+X热键查看详情", idea_pic.get(tmp).replace("*#&", "\n"), MessageType.INFO);
+			MainFrame.showToast("使用CTRL+SHIFT+X热键查看详情", idea_pic.get(tmp).replace("[换行]", "\n"), MessageType.INFO);
+			MainFrame.ideaInfoFrame.updateView(new Idea(null, idea_pic.get(tmp), null));
 			return;
 		} else {
 			MainFrame.ideaFloatFrame.updateTip(idea_pic.get(tmp));
@@ -123,7 +124,7 @@ public class IdeaFrame extends JFrame implements Runnable {
 		try {
 			remove(contentPane);
 		} catch (Exception e) {
-			
+
 		}
 		ArrayList<String> ideafiles = Utils.getFiles(MainFrame.filePath + "\\" + "idea");
 
@@ -190,7 +191,6 @@ public class IdeaFrame extends JFrame implements Runnable {
 			if (Utils.randomideashow.equals("true")) {
 				while (PlanNotifier.iswatching) {
 					ideas = MainFrame.ioUtils.getIdeaslist();
-
 					try {
 						showIdea();
 						if (Integer.parseInt(Utils.nextideashow) > 0) {
@@ -206,7 +206,7 @@ public class IdeaFrame extends JFrame implements Runnable {
 							e1.printStackTrace();
 						}
 
-						MainFrame.showToast("警告", "请检查控制idea回顾的参数是否合法", MessageType.ERROR);
+					
 					}
 				}
 			}

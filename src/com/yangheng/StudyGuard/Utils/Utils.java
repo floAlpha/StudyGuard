@@ -19,15 +19,14 @@ import java.util.List;
 import com.yangheng.StudyGuard.GUI.MainFrame;
 
 public class Utils {
-	public static String pausequery;
-	public static String startquery;
+	// public static String tipwinsizelevel;
 	public static String dailysumtime;
 	public static String cascadedelay;
 	public static String nomainwindow;
 	public static String nextideashow;
 	public static String randomideashow;
-//	public static String askfordoing;
 	public static String tiponwindow;
+	static SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");// 设置日期格式;
 
 	public static void loadConfig() {
 		ArrayList<String> configs = Utils.readTxtFileIntoStringArrList(MainFrame.filePath + "/conf/conf.txt");
@@ -36,18 +35,16 @@ public class Utils {
 			for (String string : configs) {
 				for (String s : string.split(" ")) {
 
-					if (Utils.getValueOfElementByTag(s, "[pausequery]") != null
-							&& !Utils.getValueOfElementByTag(s, "[pausequery]").equals("")) {
-						if ((pausequery = Utils.getValueOfElementByTag(s, "[pausequery]")).equals("")) {
-							MainFrame.showToast("错误", "[pausequery]配置参数错误:" + pausequery, MessageType.ERROR);
-						}
-					}
-					if (Utils.getValueOfElementByTag(s, "[startquery]") != null
-							&& !Utils.getValueOfElementByTag(s, "[startquery]").equals("")) {
-						if ((startquery = Utils.getValueOfElementByTag(s, "[startquery]")).equals("")) {
-							MainFrame.showToast("错误", "[startquery]配置参数错误:" + startquery, MessageType.ERROR);
-						}
-					}
+					// if (Utils.getValueOfElementByTag(s, "[tipwinsizelevel]")
+					// != null
+					// && !Utils.getValueOfElementByTag(s,
+					// "[tipwinsizelevel]").equals("")) {
+					// if ((tipwinsizelevel = Utils.getValueOfElementByTag(s,
+					// "[tipwinsizelevel]")).equals("")) {
+					// MainFrame.showToast("错误", "[tipwinsizelevel]配置参数错误:" +
+					// tipwinsizelevel, MessageType.ERROR);
+					// }
+					// }
 					if (Utils.getValueOfElementByTag(s, "[dailysumtime]") != null
 							&& !Utils.getValueOfElementByTag(s, "[dailysumtime]").equals("")) {
 						if ((dailysumtime = Utils.getValueOfElementByTag(s, "[dailysumtime]")).equals("")) {
@@ -69,8 +66,7 @@ public class Utils {
 					if (Utils.getValueOfElementByTag(s, "[randomideashow]") != null
 							&& !Utils.getValueOfElementByTag(s, "[randomideashow]").equals("")) {
 						if ((randomideashow = Utils.getValueOfElementByTag(s, "[randomideashow]")).equals("")) {
-							MainFrame.showToast("错误", "[randomideashow]配置参数错误:" + randomideashow,
-									MessageType.ERROR);
+							MainFrame.showToast("错误", "[randomideashow]配置参数错误:" + randomideashow, MessageType.ERROR);
 						}
 					}
 					if (Utils.getValueOfElementByTag(s, "[nextideashow]") != null
@@ -79,18 +75,13 @@ public class Utils {
 							MainFrame.showToast("错误", "[nextideashow]配置参数错误:" + nextideashow, MessageType.ERROR);
 						}
 					}
-//					if (Utils.getValueOfElementByTag(s, "[askfordoing]") != null
-//							&& !Utils.getValueOfElementByTag(s, "[askfordoing]").equals("")) {
-//						if ((askfordoing = Utils.getValueOfElementByTag(s, "[askfordoing]")).equals("")) {
-//							MainFrame.showToast("错误", "[askfordoing]配置参数错误:" + askfordoing, MessageType.ERROR);
-//						}
-//					}
 					if (Utils.getValueOfElementByTag(s, "[tiponwindow]") != null
 							&& !Utils.getValueOfElementByTag(s, "[tiponwindow]").equals("")) {
 						if ((tiponwindow = Utils.getValueOfElementByTag(s, "[tiponwindow]")).equals("")) {
 							MainFrame.showToast("错误", "[tiponwindow]配置参数错误:" + tiponwindow, MessageType.ERROR);
 						}
 					}
+					// System.out.println(tipwinsizelevel);
 				}
 
 			}
@@ -218,7 +209,6 @@ public class Utils {
 
 	public static String getTime() {
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");// 设置日期格式
 		String currentTime = df.format(new Date());// new Date()为获取当前系统时间
 		return currentTime;
 

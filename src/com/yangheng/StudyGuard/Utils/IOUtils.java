@@ -106,7 +106,7 @@ public class IOUtils extends Thread {
 	public void storeIdea(String idea) {
 		IdeaFrame mindFrame = IdeaFrame.getInstance();
 		mindFrame.setVisible(true);
-		Mind mind = new Mind(Utils.getTime().substring(0, 17), idea.replace("\n", "*#&"), "DISPLAY");
+		Mind mind = new Mind(Utils.getTime().substring(0, 17), idea.replace("\n", "[换行]"), "DISPLAY");
 		if (!idea.trim().equals(null)) {
 			try {
 				ArrayList<String> arrayList = new ArrayList<String>();
@@ -142,7 +142,7 @@ public class IOUtils extends Thread {
 
 				memolist =  Utils.readTxtFileIntoStringArrList(MainFrame.filePath + "\\memorandum\\memorandum.txt");//读取meomorandum
 
-				sleep(1000*60*10);// 3分钟IO一次
+				sleep(1000*60*3);// 3分钟IO一次
 				
 				File file = new File(MainFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11));
 				

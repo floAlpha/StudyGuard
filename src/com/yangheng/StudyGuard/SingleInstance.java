@@ -8,7 +8,9 @@ public class SingleInstance extends Thread {
 	@SuppressWarnings("resource")
 	@Override
 	public void run() {
+		
 		try {
+//			
 			@SuppressWarnings("unused")
 			Socket sock = new Socket("127.0.0.1", 55661);
 			// 创建socket，连接22222端口
@@ -19,6 +21,7 @@ public class SingleInstance extends Thread {
 			server.accept(); // 等待连接
 			server.close(); // 有连接到来，也就是说有新的实例
 			System.exit(0); // 这个实例退出
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

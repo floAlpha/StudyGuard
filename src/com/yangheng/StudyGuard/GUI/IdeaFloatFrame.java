@@ -26,8 +26,6 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.yangheng.StudyGuard.Utils.Utils;
-
 public class IdeaFloatFrame extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
@@ -49,8 +47,8 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 				}
 			}
 		} else {
-			// instance.dispose();
-			instance = new IdeaFloatFrame();
+			//instance = new IdeaFloatFrame();
+			return instance;
 		}
 		return instance;
 	}
@@ -58,12 +56,19 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 	static int mouseAtX;
 	static int mouseAtY;
 
-	public IdeaFloatFrame() {
+	private IdeaFloatFrame() {
 
+		setResizable(false);
 		Toolkit kit = Toolkit.getDefaultToolkit();
 		Dimension sc = kit.getScreenSize();
-		setSize(450, 400);
+		if (sc.width>=1920) {
+			setSize(sc.width / 3, sc.height / 2);
+		}else {
+			setSize(sc.width / 4, sc.height / 2);
+		}
+		
 		setLocation(sc.width / 3 * 2, sc.height / 9);
+
 		setUndecorated(true); // 窗口去边框
 		setAlwaysOnTop(true); // 设置窗口总在最前
 		setBackground(new Color(0, 0, 0, 0)); // 设置窗口背景为透明色
@@ -80,24 +85,22 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 			public void mouseDragged(MouseEvent e) {
 				setLocation((e.getXOnScreen() - mouseAtX), (e.getYOnScreen() - mouseAtY));// 设置拖拽后，窗口的位置
 			}
-
 		});
 
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		contentPane.setLayout(null);
 		contentPane.setOpaque(false);
 		setContentPane(contentPane);
+		tip.setEnabled(false);
 
 		tip.setFont(new Font("宋体", Font.BOLD, 18));
 		tip.setOpaque(false);
 		tip.setWrapStyleWord(true);
 		tip.setLineWrap(true);
 		tip.setText("");
-
 		tip.setEditable(false);
-		tip.setEnabled(false);
-		tip.setForeground(Color.BLACK);
+		tip.setForeground(Color.green);
 
 		tip.addMouseListener(new MouseAdapter() // 设置窗口可拖动
 		{
@@ -109,8 +112,7 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				tip.setEnabled(true);
-				// tip.setDisabledTextColor(Color.black);
-				tip.setForeground(Color.black);
+				tip.setForeground(Color.green);
 			}
 
 			@Override
@@ -121,37 +123,23 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				tip.setEnabled(true);
-				// tip.setDisabledTextColor(Color.black);
+				tip.setEnabled(false);
 				tip.setForeground(Color.green);
 			}
 
-			boolean first_click = true;
-			long start, end;
+			long end = new Date().getTime();
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (first_click) {
-					start = new Date().getTime();
-					first_click = false;
-				} else {
+				if (new Date().getTime() - end > 500) {
 					end = new Date().getTime();
-					if (end - start < 500) {
-
-						File file = new File(content);
-						if (file.exists()) {
-							System.out.println(content);
-							content = content.replace("DISPLAY", "NODISPLAY");
-							file.renameTo(new File(content));
-							first_click = true;
-						} else {
-
-							IdeaInfoFrame.disableDisplay(content);
-						}
+				} else {
+					if (new Date().getTime() - end < 500) {
+						IdeaInfoFrame.disableDisplay(content);
+						MainFrame.showToast("提示", "已设置该速记不再显示", MessageType.INFO);
 					}
-					first_click = true;
+					end = new Date().getTime();
 				}
-
 			}
 		});
 		tip.addMouseMotionListener(new MouseMotionAdapter() {
@@ -171,7 +159,7 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 				setLocation((e.getXOnScreen() - mouseAtX), (e.getYOnScreen() - mouseAtY));// 设置拖拽后，窗口的位置
 			}
 		});
-		tip.setBounds(10, 10, 430, 380);
+		tip.setBounds(0, 0, (int) getSize().getWidth(), (int) getSize().getWidth());
 
 		contentPane.add(tip);
 
@@ -203,6 +191,7 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 					BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D g2D = (Graphics2D) bufferedImage.getGraphics();
 			g2D.drawImage(imageIcon.getImage(), 0, 0, imageIcon.getImageObserver());
+
 			// 判读透明度是否越界
 			if (alpha < 0) {
 				alpha = 0;
@@ -224,10 +213,34 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 			e.printStackTrace();
 		}
 		return null;
-
 	}
 
+	// public void resizeWindow(int sizelevel) {
+	// if (sizelevel == 1) {
+	// Toolkit kit = Toolkit.getDefaultToolkit();
+	// Dimension sc = kit.getScreenSize();
+	// setSize(sc.width / 4, sc.height / 2);
+	// setLocation(sc.width / 3 * 2, sc.height / 9);
+	// }
+	// if (sizelevel == 2) {
+	// Toolkit kit = Toolkit.getDefaultToolkit();
+	// Dimension sc = kit.getScreenSize();
+	// setSize(sc.width / 3, sc.height / 2);
+	// setLocation(sc.width / 3, sc.height / 9);
+	//
+	// }
+	// if (sizelevel == 3) {
+	// Toolkit kit = Toolkit.getDefaultToolkit();
+	// Dimension sc = kit.getScreenSize();
+	// setSize(sc.width / 2, sc.height / 2);
+	// setLocation(sc.width / 2, sc.height / 9);
+	//
+	// }
+	//
+	// }
+
 	public void updateTip(String s) {
+
 		try {
 			content = s;
 			File file = new File(s);
@@ -236,9 +249,12 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 
 				tip.setVisible(false);
 				try {
+					if (label != null) {
+
+					}
 					remove(label);
 				} catch (Exception e) {
-					
+
 					e.printStackTrace();
 				}
 				label = new JLabel() {
@@ -256,64 +272,64 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 						mouseAtY = e.getPoint().y;
 					}
 
-					@Override
-					public void mouseEntered(MouseEvent e) {
-						tip.setEnabled(true);
-						tip.setForeground(Color.BLACK);
+				});
+				label.addMouseMotionListener(new MouseMotionAdapter() {
+					public void mouseDragged(MouseEvent e) {
+						setLocation((e.getXOnScreen() - mouseAtX), (e.getYOnScreen() - mouseAtY));// 设置拖拽后，窗口的位置
 					}
 
-					@Override
-					public void mouseExited(MouseEvent e) {
-						tip.setEnabled(false);
+				});
+
+				label.addMouseListener(new MouseAdapter() // 设置窗口可拖动
+				{
+					public void mousePressed(MouseEvent e) {
+						mouseAtX = e.getPoint().x;
+						mouseAtY = e.getPoint().y;
 					}
 
-					boolean first_click = true;
-					long start, end;
+					long end = new Date().getTime();
 
 					@Override
 					public void mouseClicked(MouseEvent e) {
-						if (first_click) {
+						if (new Date().getTime() - end > 500) {
+							end = new Date().getTime();
 							try {
-								Runtime.getRuntime().exec("explorer "+content);
+								Runtime.getRuntime().exec("explorer " + content);
 							} catch (IOException e1) {
-						
+
 								e1.printStackTrace();
 							}
-							start = new Date().getTime();
-							first_click = false;
 						} else {
-							end = new Date().getTime();
-							if (end - start < 500) {
 
+							if (new Date().getTime() - end < 500) {
 								File file = new File(content);
 								if (file.exists()) {
 
 									content = content.replace("DISPLAY", "NODISPLAY");
 									file.renameTo(new File(content));
-									first_click = true;
-									
 								}
-
+								MainFrame.showToast("提示", "已设置该速记不再显示", MessageType.INFO);
 							}
-							MainFrame.showToast("提示", "已设置该速记不再显示",MessageType.INFO);
-							first_click = true;
+							end = new Date().getTime();
 						}
-
 					}
 				});
-				label.setBackground(new Color(550000));
 				label.setHorizontalAlignment(SwingConstants.CENTER);
-				label.setBounds(10, 10, 430, 480);
+				label.setBounds(0, 0, (int) getSize().getWidth(), (int) getSize().getWidth() * 2 / 3);
+
 				contentPane.add(label);
 
 				invalidate();
 			} else {
 				try {
-					label.setVisible(false);
+					if (label != null) {
+						remove(label);
+					}
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				tip.setText(s);
+				tip.setText(s.replace("[换行]", "\n"));
 				tip.setVisible(true);
 				invalidate();
 			}
@@ -327,16 +343,15 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
-			if (Utils.getTime().substring(15, 17).equals("21")) {
-				updateTip("双击此处不再显示此条笔记");
-			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+//		while (true) {
+//
+//			try {
+//
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 	}
 }

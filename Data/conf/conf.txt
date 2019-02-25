@@ -6,3 +6,4 @@
 [nextideashow]1[nextideashow] [detail]显示idea的时间间隔，时间单位分钟，设置为0则随机出现下一条idea回顾
 [randomideashow]true[randomideashow] [detail]随机回顾记录的idea
 [tiponwindow]true[tiponwindow] [detail]使用悬浮窗显示速记，false则使用通知显示[detail]
+[tipwinsizelevel]1[tipwinsizelevel] [detail]控制速记回顾悬浮窗尺寸等级，分为1，2，3级[detail]

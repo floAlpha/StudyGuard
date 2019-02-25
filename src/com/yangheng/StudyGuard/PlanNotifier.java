@@ -1,6 +1,5 @@
 package com.yangheng.StudyGuard;
 
-import java.awt.TrayIcon.MessageType;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import com.yangheng.StudyGuard.GUI.MainFrame;
-import com.yangheng.StudyGuard.GUI.PlanInfoFrame;
 import com.yangheng.StudyGuard.Object.StudyPlan;
 import com.yangheng.StudyGuard.Utils.Utils;
 
@@ -21,7 +19,6 @@ public class PlanNotifier extends Thread {
 	public static ArrayList<String> planlist;
 	public static boolean isalive = true;
 	public static boolean iswatching = true;
-
 
 	public static void dailyPlanSum() {
 		if (Utils.getTime().substring(12, 17).equals(Utils.dailysumtime)) {
@@ -34,7 +31,7 @@ public class PlanNotifier extends Thread {
 							&& Utils.getValueOfElementByTag(s, "[finish]").equals("完成")) {
 						finished++;
 					}
-					// System.out.println(s);
+
 					Utils.writeToFileByRow(s,
 							MainFrame.filePath + "\\dailyplan\\" + Utils.getTime().substring(0, 11) + ".txt");
 				}
@@ -59,31 +56,18 @@ public class PlanNotifier extends Thread {
 		while (true) {
 
 			while (iswatching) {
-//				Utils.loadConfig();
-				if (Utils.getTime().substring(12, 17).equals(Utils.pausequery)) {
-					try {
-						SimpleDateFormat simpleFormat = new SimpleDateFormat("hh:mm");
-						Date pauseTime = simpleFormat.parse(Utils.pausequery);
-						Date startTime = simpleFormat.parse(Utils.startquery);
-						MainFrame.showToast("通知", "关闭学习情况询问", MessageType.INFO);
-						sleep(Math.abs((startTime.getTime() - pauseTime.getTime())));
-						MainFrame.showToast("通知", "关闭学习情况询问", MessageType.INFO);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
 
-//				Watcher.load_study_plan();
-				planlist=MainFrame.ioUtils.getPlanlist();
-//				System.out.println(planlist);
+				planlist = MainFrame.ioUtils.getPlanlist();
+				String time = Utils.getTime();
 				for (int i = 0; i < planlist.size(); i++) {
 					String string = planlist.get(i);
 					StudyPlan sp = new StudyPlan(string);
-					if (Utils.getTime().substring(12, 17).equals(sp.getTime())) {
+					if (time.substring(12, 17).equals(sp.getTime())) {
 						for (int j = 0; j < i; j++) {
+							System.out.println(sp);
 							StudyPlan sp1 = new StudyPlan(planlist.get(j));
 							if (sp1.getFinish().equals("")) {
-//								java.awt.Toolkit.getDefaultToolkit().beep();
+								// java.awt.Toolkit.getDefaultToolkit().beep();
 								int answer = JOptionPane.showConfirmDialog(null,
 										sp1.getTime() + " 任务[ " + (sp1.getTask()) + " ]是否完成？", "警告",
 										JOptionPane.YES_NO_OPTION);
@@ -150,31 +134,51 @@ public class PlanNotifier extends Thread {
 								e.printStackTrace();
 							}
 						}
-//						File file = new File(MainFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11));
-//						if (file.exists()) {
-//							file.delete();
-//						}
-						PlanInfoFrame planInfoFrame = PlanInfoFrame.getInstance();
-						planInfoFrame.setVisible(true);
-						new Thread(planInfoFrame).start();
 
-					}
-				}
-				Collections.sort((List<String>) planlist, new Comparator<String>() {
-					@Override
-					public int compare(String o1, String o2) {
-						if (o1.compareTo(o2) < 0) {
-							return -1;
-						} else if (o1.compareTo(o2) == 0) {
-							return 0;
-						} else {
-							return 1;
+						try {
+							sleep(60000);// 提醒一次休眠
+						} catch (InterruptedException e) {
+
+							e.printStackTrace();
 						}
-
 					}
-				});
 
-				dailyPlanSum();// 生成每日学习计划总结
+				}
+				if (time.substring(12, 17).equals("00:00")) {
+					for (int j = 0; j < planlist.size(); j++) {
+						StudyPlan sp1 = new StudyPlan(planlist.get(j));
+						if (sp1.getFinish().equals("")) {
+							// java.awt.Toolkit.getDefaultToolkit().beep();
+							int answer = JOptionPane.showConfirmDialog(null,
+									sp1.getTime() + " 任务[ " + (sp1.getTask()) + " ]是否完成？", "警告",
+									JOptionPane.YES_NO_OPTION);
+							if (answer == 0) {
+								sp1.setFinish("完成");
+								planlist.set(j, sp1.toString());
+							} else {
+								sp1.setFinish("未完成");
+								planlist.set(j, sp1.toString());
+							}
+						}
+					}
+
+					Collections.sort((List<String>) planlist, new Comparator<String>() {
+						@Override
+						public int compare(String o1, String o2) {
+							if (o1.compareTo(o2) < 0) {
+								return -1;
+							} else if (o1.compareTo(o2) == 0) {
+								return 0;
+							} else {
+								return 1;
+							}
+
+						}
+					});
+
+					dailyPlanSum();// 生成每日学习计划总结
+
+				}
 				try {
 					sleep(55000);
 				} catch (InterruptedException e) {

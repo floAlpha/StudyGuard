@@ -64,12 +64,12 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 	// 实现阻止程序多次启动
 	public static PlanInfoFrame getInstance() {
 
+		
 		if (instance == null) {
 			synchronized (PlanInfoFrame.class) {
 				if (instance == null) {
 					instance = new PlanInfoFrame();
-					instance.setVisible(true);
-					instance.setAlwaysOnTop(true);
+			
 				}
 			}
 		}

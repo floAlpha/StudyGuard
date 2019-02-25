@@ -240,18 +240,13 @@ public class MemorandumFrame extends JFrame implements Runnable {
 
 	public static void showMemorandum() {
 		try {
-			
+
 			ArrayList<String> memorandums = MainFrame.ioUtils.getMemolist();
 			for (String string : memorandums) {
-		
+
 				Memorandum memorandum = new Memorandum(string);
-				System.out.println(Utils.getTime());
-				System.out.println(memorandum.getTime());
-				
-				System.out.println(Utils.getTime().contains(memorandum.getTime()));
-				System.out.println();
 				if (Utils.getTime().contains(memorandum.getTime())) {
-		
+
 					MainFrame.showToast("[±¸ÍüÂ¼]" + memorandum.getTime(), memorandum.getContent(), MessageType.INFO);
 				}
 			}
