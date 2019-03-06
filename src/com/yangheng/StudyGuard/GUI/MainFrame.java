@@ -449,7 +449,6 @@ public class MainFrame extends JFrame implements Runnable {
 						break;
 					}
 				}
-
 			} else {
 				ArrayList<String> proverbs = IOUtils.proverblist;
 				MainFrame.trayIcon.setToolTip(proverbs.get((int) (Math.random() * proverbs.size())));

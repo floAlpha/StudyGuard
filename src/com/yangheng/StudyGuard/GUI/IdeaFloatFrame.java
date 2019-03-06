@@ -31,6 +31,10 @@ import com.yangheng.StudyGuard.Utils.FileUtils;
 
 public class IdeaFloatFrame extends JFrame implements Runnable {
 
+	PicFloatFrame picFloatFrame;
+	// static Thread picThread;
+	static boolean showpicfloatframe = false;
+
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JLabel label;
@@ -101,7 +105,6 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 		tip.setText("");
 		tip.setEditable(false);
 		tip.setDisabledTextColor(Color.DARK_GRAY);
-		
 
 		tip.addMouseListener(new MouseAdapter() // 设置窗口可拖动
 		{
@@ -109,18 +112,6 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 				mouseAtX = e.getPoint().x;
 				mouseAtY = e.getPoint().y;
 			}
-
-//			@Override
-//			public void mouseEntered(MouseEvent e) {
-//				tip.setEnabled(true);
-//				tip.setForeground(Color.green);
-//			}
-//
-//			@Override
-//			public void mouseExited(MouseEvent e) {
-//				tip.setEnabled(false);
-//				tip.setDisabledTextColor(Color.LIGHT_GRAY);
-//			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
@@ -165,9 +156,8 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 			}
 		});
 		tip.setBounds(0, 0, (int) getSize().getWidth(), (int) getSize().getWidth());
-		
+
 		contentPane.add(tip);
-		new Thread(this).start();
 
 	}
 
@@ -195,6 +185,7 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 			ImageIcon imageIcon = new ImageIcon(os.toByteArray());
 			BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(),
 					BufferedImage.TYPE_4BYTE_ABGR);
+
 			Graphics2D g2D = (Graphics2D) bufferedImage.getGraphics();
 			g2D.drawImage(imageIcon.getImage(), 0, 0, imageIcon.getImageObserver());
 			g2D.dispose();
@@ -222,8 +213,8 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 	}
 
 	public void updateTip(final String s) {
-		// System.out.println(Utils.getTime()+s);
 		getContentPane().setVisible(false);
+
 		try {
 			content = s;
 			File file = new File(s);
@@ -242,11 +233,18 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 					getContentPane().remove(label);
 				} catch (Exception e) {
 				}
+
 				label = new JLabel() {
 					private static final long serialVersionUID = 1L;
 
 					public void paintComponent(Graphics g) {
-						Image img = transparentImage(s, 7);
+						Image img = transparentImage(s, 5);
+						if (picFloatFrame != null) {
+							picFloatFrame.status = false;
+							picFloatFrame.dispose();
+						}
+						picFloatFrame = new PicFloatFrame(s);
+						new Thread(picFloatFrame).start();
 						g.drawImage(img, 0, 0, this.getSize().width, this.getSize().height, this);
 					}
 				};
@@ -261,6 +259,16 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 					public void mousePressed(MouseEvent e) {
 						mouseAtX = e.getPoint().x;
 						mouseAtY = e.getPoint().y;
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						showpicfloatframe = true;
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+						showpicfloatframe = false;
 					}
 
 					@Override
@@ -305,6 +313,7 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 		}
 		getContentPane().setVisible(true);
 
+		// new Thread(picFloatFrame).start();
 	}
 
 	@Override
@@ -318,5 +327,53 @@ public class IdeaFloatFrame extends JFrame implements Runnable {
 			}
 		}
 
+	}
+}
+
+class PicFloatFrame extends JFrame implements Runnable {
+
+	private static final long serialVersionUID = 1L;
+	public boolean status = true;
+	public String s;
+
+	JPanel contentPane;
+
+	public PicFloatFrame(String s) {
+		this.s = s;
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		contentPane.setLayout(null);
+		contentPane.setOpaque(false);
+		setContentPane(contentPane);
+
+		ImageIcon imgicon = new ImageIcon(s);
+		setSize(imgicon.getIconWidth(), imgicon.getIconHeight());
+		setLocationRelativeTo(null);
+		setUndecorated(true); // 窗口去边框
+		setAlwaysOnTop(true); // 设置窗口总在最前
+		setBackground(new Color(0, 0, 0, 0)); // 设置窗口背景为透明色
+		setType(JFrame.Type.UTILITY);// 隐藏任务栏图标
+
+		JLabel label = new JLabel(imgicon);
+		label.setBounds(0, 0, imgicon.getIconWidth(), imgicon.getIconHeight());
+		contentPane.add(label);
+		label.setVisible(true);
+
+	}
+
+	@Override
+	public void run() {
+		while (status) {
+			if (IdeaFloatFrame.showpicfloatframe) {
+				setVisible(true);
+			} else {
+				setVisible(false);
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

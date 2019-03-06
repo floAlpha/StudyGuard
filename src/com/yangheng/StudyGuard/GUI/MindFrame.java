@@ -24,7 +24,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import com.yangheng.StudyGuard.Object.Mind;
 import com.yangheng.StudyGuard.Utils.Utils;
 
-public class MindFrame extends JFrame implements Runnable {
+public class MindFrame extends JFrame {
 
 	/**
 	 * 
@@ -71,60 +71,7 @@ public class MindFrame extends JFrame implements Runnable {
 			}
 		}
 	}
-//
-//	public static void storeIdea() {
-//		MindFrame mindFrame = MindFrame.getInstance();
-//		mindFrame.setVisible(true);
-//		String string = JOptionPane.showInputDialog(null, "请输入你的想法:", "IDEA录入", JOptionPane.OK_CANCEL_OPTION);
-//		Mind mind = new Mind(Utils.getTime().substring(0, 17), string, "DISPLAY");
-//		if (!string.equals(null)) {
-//			try {
-//				ArrayList<String> arrayList = new ArrayList<String>();
-//				arrayList.add(mind.toString());
-//				Utils.writeObjectsToFile(arrayList,
-//						MainGuardFrame.filePath + "\\idea\\" + Utils.getTime().substring(0, 11) + ".txt");
-//				instance.dispose();
-//				instance = new MindFrame();
-//				instance.setVisible(true);
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//
-//	}
-
-//	private ArrayList<Mind> getMinds(String mindpath) {
-//		ArrayList<String> minddatabase = Utils.getFiles(mindpath);
-//		ArrayList<String> mindlist = Utils
-//				.readTxtFileIntoStringArrList(minddatabase.get((int) (Math.random() * minddatabase.size())));
-//		ArrayList<Mind> ideas = new ArrayList<Mind>();
-//		for (int i = 0; i < mindlist.size(); i++) {
-//			ideas.add(new Mind(mindlist.get(i)));
-//		}
-//		return ideas;
-//	}
-//
-//	public void showIdea() {
-//		ArrayList<Mind> minds = getMinds(mindpath);
-//		System.out.println(minds);
-//		int count = 0;
-//		if (minds.size()==0) {
-//			return;
-//		}
-//		while ( count < minds.size()) {
-//			int i = ((int) (Math.random() * minds.size()));
-//			if (minds.get(i).getTag().equals("DISPLAY")){
-//				MainGuardFrame.showToast("idea回顾", minds.get(i).getContent(), MessageType.INFO);
-//				currentmind=minds.get(i);
-//				return;
-//			}
-//			count++;
-//		}
-////		showIdea();
-//	}
-
 	JPanel contentPane;
-
 
 	private MindFrame() {
 
@@ -145,25 +92,11 @@ public class MindFrame extends JFrame implements Runnable {
 			}
 		}, AWTEvent.KEY_EVENT_MASK);
 		
-//		addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowClosing(WindowEvent e) {
-//				try {
-//					File file = new File(MainGuardFrame.studyPlanPath);
-//					if (file.exists()) {
-//						file.delete();
-//					}
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
-//			}
-//		});
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout());
-		// System.out.println(MainGuardFrame.filePath + "\\" + "idea");
 		try {
 			remove(contentPane);
 		} catch (Exception e) {
@@ -173,17 +106,13 @@ public class MindFrame extends JFrame implements Runnable {
 
 		ArrayList<Mind> minds = new ArrayList<Mind>();
 		for (String ideafile : ideafiles) {
-			// System.out.println(Utils.readTxtFileIntoStringArrList(ideafile));
 			for (String idea : Utils.readTxtFileIntoStringArrList(ideafile)) {
-				// System.out.println("idea"+idea);
 				minds.add(new Mind(idea));
 			}
 		}
-		// System.out.println(minds);
 
 		Vector<Vector<String>> tabledata = new Vector<Vector<String>>();
 		for (Mind mind : minds) {
-			// String[] tmp = idea.split(" ");
 			Vector<String> row = new Vector<String>();
 			try {
 
@@ -200,8 +129,6 @@ public class MindFrame extends JFrame implements Runnable {
 		columnTitle.add("时间");
 		columnTitle.add("Mind");
 		JTable table = new JTable(tabledata, columnTitle);
-		// System.out.println(columnTitle );
-		// System.out.println(tabledata);
 		table.setRowSelectionAllowed(false);
 		table.setLayout(new BorderLayout());
 		table.setRowHeight(26);
@@ -219,10 +146,8 @@ public class MindFrame extends JFrame implements Runnable {
 		table.getTableHeader().setPreferredSize(new Dimension(1, 30));
 		table.getTableHeader().setFont(new Font("楷体", Font.BOLD, 16));
 		table.getTableHeader().setBackground(Color.green);
-		// table.setCellSelectionEnabled(true);
 		table.setRowSelectionAllowed(true);
 		table.setSelectionBackground(Color.GREEN);
-		// table.setColumnSelectionAllowed(false);
 
 		JScrollPane ideascrollPane = new JScrollPane(table);
 		ideascrollPane.setBounds(10, 10, 840, 616);
@@ -233,9 +158,4 @@ public class MindFrame extends JFrame implements Runnable {
 	}
 
 
-	@Override
-	public void run() {
-
-		
-	}
 }
