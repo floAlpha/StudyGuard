@@ -20,15 +20,13 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import com.yangheng.StudyGuard.PlanNotifier;
 import com.yangheng.StudyGuard.Object.Idea;
-import com.yangheng.StudyGuard.Object.Mind;
+import com.yangheng.StudyGuard.Utils.IOUtils;
 import com.yangheng.StudyGuard.Utils.Utils;
 
 public class IdeaFrame extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
-	static String mindpath = MainFrame.filePath + "\\idea";
 	public static IdeaFrame instance = null;
 	static ArrayList<String> ideas;
 	public static Idea currentmind = null;
@@ -50,8 +48,11 @@ public class IdeaFrame extends JFrame implements Runnable {
 	}
 
 	public void showIdea() {
-		ArrayList<Idea> ideas = MainFrame.ioUtils.getIdeas(mindpath);
 
+		ArrayList<Idea> ideas = new ArrayList<Idea>();
+		for (String string : IOUtils.ideaslist) {
+			ideas.add(new Idea(string));
+		}
 		ArrayList<String> idea_pic = Utils.getFiles(MainFrame.filePath + "\\idea\\pic");
 
 		for (int i = 0; i < idea_pic.size(); i++) {
@@ -73,7 +74,6 @@ public class IdeaFrame extends JFrame implements Runnable {
 					break;
 				}
 			}
-
 		}
 
 		if (!Utils.tiponwindow.equals("true")) {
@@ -82,9 +82,7 @@ public class IdeaFrame extends JFrame implements Runnable {
 			return;
 		} else {
 			MainFrame.ideaFloatFrame.updateTip(idea_pic.get(tmp));
-			MainFrame.ideaFloatFrame.invalidate();
 		}
-
 	}
 
 	JPanel contentPane;
@@ -126,22 +124,18 @@ public class IdeaFrame extends JFrame implements Runnable {
 		} catch (Exception e) {
 
 		}
-		ArrayList<String> ideafiles = Utils.getFiles(MainFrame.filePath + "\\" + "idea");
 
-		ArrayList<Mind> minds = new ArrayList<Mind>();
-		for (String ideafile : ideafiles) {
-			for (String idea : Utils.readTxtFileIntoStringArrList(ideafile)) {
-				minds.add(new Mind(idea.replace("*#&", "\n")));
-			}
+		ArrayList<Idea> ideas = new ArrayList<Idea>();
+		for (String idea : IOUtils.ideaslist) {
+			ideas.add(new Idea(idea));
 		}
-
 		Vector<Vector<String>> tabledata = new Vector<Vector<String>>();
-		for (Mind mind : minds) {
+		for (Idea idea : ideas) {
 			Vector<String> row = new Vector<String>();
 			try {
 
-				row.add(mind.getTime());
-				row.add(mind.getContent());
+				row.add(idea.getTime());
+				row.add(idea.getContent());
 
 				tabledata.add(row);
 			} catch (Exception e) {
@@ -189,35 +183,20 @@ public class IdeaFrame extends JFrame implements Runnable {
 
 		while (true) {
 			if (Utils.randomideashow.equals("true")) {
-				while (PlanNotifier.iswatching) {
-					ideas = MainFrame.ioUtils.getIdeaslist();
-					try {
-						showIdea();
-						if (Integer.parseInt(Utils.nextideashow) > 0) {
-							Thread.sleep(Integer.parseInt(Utils.nextideashow) * 60000);
-						} else {
-							Thread.sleep((long) (((Math.random() * 0.5 + 0.1) * 6000000)));
-						}
+				ideas = IOUtils.ideaslist;
 
-					} catch (Exception e) {
-						try {
-							Thread.sleep(60000);
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
-						}
-
-					
+				try {
+					showIdea();
+					if (Integer.parseInt(Utils.nextideashow) > 0) {
+						Thread.sleep(Integer.parseInt(Utils.nextideashow) * 60000);
+					} else {
+						Thread.sleep((long) (((Math.random() * 0.5 + 0.1) * 6000000)));
 					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
-
-			try {
-				Thread.sleep(60000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
 		}
-
 	}
+
 }

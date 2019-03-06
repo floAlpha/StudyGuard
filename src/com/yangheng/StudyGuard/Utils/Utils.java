@@ -1,5 +1,7 @@
 package com.yangheng.StudyGuard.Utils;
 
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.TrayIcon.MessageType;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,6 +17,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.JFrame;
 
 import com.yangheng.StudyGuard.GUI.MainFrame;
 
@@ -26,7 +32,16 @@ public class Utils {
 	public static String nextideashow;
 	public static String randomideashow;
 	public static String tiponwindow;
-	static SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");// 设置日期格式;
+	public static String poems;
+	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");// 设置日期格式;
+
+	public static void runAsTimer(TimerTask task) {
+		Timer timer = new Timer();
+		Date date = new Date();
+		long time = (date.getTime() / 1000 / 60) * 60 * 1000 + 60 * 1000;
+		timer.schedule(task, new Date(time), 60 * 1000);
+		// timer.schedule(task, new Date(), 1000 );
+	}
 
 	public static void loadConfig() {
 		ArrayList<String> configs = Utils.readTxtFileIntoStringArrList(MainFrame.filePath + "/conf/conf.txt");
@@ -35,16 +50,6 @@ public class Utils {
 			for (String string : configs) {
 				for (String s : string.split(" ")) {
 
-					// if (Utils.getValueOfElementByTag(s, "[tipwinsizelevel]")
-					// != null
-					// && !Utils.getValueOfElementByTag(s,
-					// "[tipwinsizelevel]").equals("")) {
-					// if ((tipwinsizelevel = Utils.getValueOfElementByTag(s,
-					// "[tipwinsizelevel]")).equals("")) {
-					// MainFrame.showToast("错误", "[tipwinsizelevel]配置参数错误:" +
-					// tipwinsizelevel, MessageType.ERROR);
-					// }
-					// }
 					if (Utils.getValueOfElementByTag(s, "[dailysumtime]") != null
 							&& !Utils.getValueOfElementByTag(s, "[dailysumtime]").equals("")) {
 						if ((dailysumtime = Utils.getValueOfElementByTag(s, "[dailysumtime]")).equals("")) {
@@ -81,7 +86,13 @@ public class Utils {
 							MainFrame.showToast("错误", "[tiponwindow]配置参数错误:" + tiponwindow, MessageType.ERROR);
 						}
 					}
-					// System.out.println(tipwinsizelevel);
+					if (Utils.getValueOfElementByTag(s, "[poems]") != null
+							&& !Utils.getValueOfElementByTag(s, "[poems]").equals("")) {
+						if ((poems = Utils.getValueOfElementByTag(s, "[poems]")).equals("")) {
+							MainFrame.showToast("错误", "[poems]配置参数错误:" + poems, MessageType.ERROR);
+						}
+					}
+
 				}
 
 			}
@@ -119,7 +130,7 @@ public class Utils {
 					if (lineTxt.equals("")) {
 						continue;
 					}
-					list.add(lineTxt.replace('：', ':'));
+					list.add(lineTxt.replace('：', ':').replace("[换行]", "\n"));
 				}
 				bufferedReader.close();
 				read.close();
@@ -157,7 +168,7 @@ public class Utils {
 		BufferedWriter out = null;
 		try {
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true)));
-			out.write(string + "\r\n");
+			out.write(string.replace("[换行]", "\n") + "\r\n");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -192,7 +203,7 @@ public class Utils {
 		try {
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true)));
 			for (String item : objects) {
-				out.write(item + "\r\n\r\n");
+				out.write(item.replace("\n", "[换行]") + "\r\n\r\n");
 			}
 
 		} catch (Exception e) {
@@ -209,7 +220,7 @@ public class Utils {
 
 	public static String getTime() {
 
-		String currentTime = df.format(new Date());// new Date()为获取当前系统时间
+		String currentTime = sdf.format(new Date());// new Date()为获取当前系统时间
 		return currentTime;
 
 	}
@@ -245,6 +256,38 @@ public class Utils {
 		} catch (Exception e) {
 
 			return "";
+		}
+	}
+
+	/**
+	 * frame中的控件自适应frame大小：改变大小位置和字体
+	 * 
+	 * @param frame
+	 *            要控制的窗体
+	 * @param proportion
+	 *            当前和原始的比例
+	 */
+	public static void modifyComponentSize(JFrame frame, float proportionW, float proportionH) {
+
+		try {
+			Component[] components = frame.getRootPane().getContentPane().getComponents();
+			for (Component co : components) {
+				// String a = co.getClass().getName();//获取类型名称
+				// if(a.equals("javax.swing.JLabel"))
+				// {
+				// }
+				float locX = co.getX() * proportionW;
+				float locY = co.getY() * proportionH;
+				float width = co.getWidth() * proportionW;
+				float height = co.getHeight() * proportionH;
+				co.setLocation((int) locX, (int) locY);
+				co.setSize((int) width, (int) height);
+				int size = (int) (co.getFont().getSize() * proportionH);
+				Font font = new Font(co.getFont().getFontName(), co.getFont().getStyle(), size);
+				co.setFont(font);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 	}
 

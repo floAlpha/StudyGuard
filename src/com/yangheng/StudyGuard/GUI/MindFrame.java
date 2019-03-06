@@ -189,7 +189,6 @@ public class MindFrame extends JFrame implements Runnable {
 
 				row.add(mind.getTime());
 				row.add(mind.getContent());
-
 				tabledata.add(row);
 			} catch (Exception e) {
 

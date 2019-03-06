@@ -22,6 +22,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -83,25 +84,25 @@ public class MainFrame extends JFrame implements Runnable {
 		trayIcon.displayMessage("速记助手V1.1", message, messageType);
 
 	}
-	
-	private static void initGlobalFont(){
 
-	    FontUIResource fontUIResource = new FontUIResource(new Font("黑体",Font.PLAIN, 12));
+	private static void initGlobalFont() {
 
-	    for (@SuppressWarnings("rawtypes")
+		FontUIResource fontUIResource = new FontUIResource(new Font("黑体", Font.PLAIN, 12));
+
+		for (@SuppressWarnings("rawtypes")
 		Enumeration keys = UIManager.getDefaults().keys(); keys.hasMoreElements();) {
 
-	        Object key = keys.nextElement();
+			Object key = keys.nextElement();
 
-	        Object value= UIManager.get(key);
+			Object value = UIManager.get(key);
 
-	        if (value instanceof FontUIResource) {
+			if (value instanceof FontUIResource) {
 
-	            UIManager.put(key, fontUIResource);
+				UIManager.put(key, fontUIResource);
 
-	        }  
+			}
 
-	    }
+		}
 
 	}
 
@@ -115,9 +116,9 @@ public class MainFrame extends JFrame implements Runnable {
 
 	// 实现阻止程序多次启动
 	public static MainFrame getInstance() {
-		
+
 		initGlobalFont();
-	
+
 		MainFrame.filePath = getAppPath() + "/Data/";
 		try {
 			systemTray = SystemTray.getSystemTray();
@@ -217,7 +218,7 @@ public class MainFrame extends JFrame implements Runnable {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		this.setResizable(false);
-		setBounds(100, 100, 489, 255);
+		setBounds(100, 100, 489, 270);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -265,7 +266,7 @@ public class MainFrame extends JFrame implements Runnable {
 		});
 		takeidea.setForeground(Color.BLUE);
 		takeidea.setFont(new Font("楷体", Font.BOLD, 16));
-		takeidea.setBounds(35, 167, 173, 39);
+		takeidea.setBounds(35, 171, 173, 39);
 		contentPane.add(takeidea);
 
 		JButton takeMemorandumFrame = new JButton("\u5907\u5FD8\u5F55 (F2)");
@@ -278,12 +279,12 @@ public class MainFrame extends JFrame implements Runnable {
 		});
 		takeMemorandumFrame.setForeground(Color.BLUE);
 		takeMemorandumFrame.setFont(new Font("楷体", Font.BOLD, 18));
-		takeMemorandumFrame.setBounds(277, 167, 173, 39);
+		takeMemorandumFrame.setBounds(277, 171, 173, 39);
 		contentPane.add(takeMemorandumFrame);
 
 		pausewatch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				PlanInputFrame planInputFrame = new PlanInputFrame();
 				planInputFrame.setVisible(true);
 				planInputFrame.setAlwaysOnTop(true);
@@ -321,24 +322,26 @@ public class MainFrame extends JFrame implements Runnable {
 		btnf.setBounds(35, 80, 173, 38);
 		contentPane.add(btnf);
 
-		
-		
-		new Thread(IdeaFrame.getInstance()).start();
-		new Thread(new MemorandumFrame()).start();
-		new Thread(new TipFrame()).start();	
-		TipFrame tipFrame= new TipFrame();
-		tipFrame.setVisible(true);
-		tipFrame.setAlwaysOnTop(true);
+		try {
+			new Thread(IdeaFrame.getInstance()).start();
+		} catch (Exception e) {
+		}
+
+		Utils.runAsTimer(new TimerTask() {
+			@Override
+			public void run() {
+				MemorandumFrame.showMemorandum();
+			}
+		});
+
+		tipFrame = new TipFrame();
 		new Thread(tipFrame).start();
-	
-		new Thread(new PlanNotifier()).start();
-		
-		planInfoFrame = PlanInfoFrame.getInstance();
-		planInfoFrame.setVisible(false);
+
+		planInfoFrame = new PlanInfoFrame();
 		new Thread(planInfoFrame).start();
-		
-		ideaFloatFrame.setAlwaysOnTop(true);
+		planInfoFrame.setVisible(false);
 		ideaFloatFrame.setVisible(true);
+		Utils.runAsTimer(new PlanNotifier());
 
 		try {
 			JIntellitype.setLibraryLocation(realPath + "\\JIntellitype64.dll");
@@ -434,8 +437,24 @@ public class MainFrame extends JFrame implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			ArrayList<String> proverbs = ioUtils.getProverblist();
-			MainFrame.trayIcon.setToolTip(proverbs.get((int) (Math.random() * proverbs.size())));
+			if (Utils.poems.equals("true")) {
+
+				String json = IOUtils.sendGet("https://api.gushi.ci/all.json", null);
+
+				String[] items = json.split(",");
+				for (String string : items) {
+					if (string.contains("content")) {
+						MainFrame.trayIcon
+								.setToolTip(string.split("\"")[string.split("\"").length - 1].replace("。", ""));
+						break;
+					}
+				}
+
+			} else {
+				ArrayList<String> proverbs = IOUtils.proverblist;
+				MainFrame.trayIcon.setToolTip(proverbs.get((int) (Math.random() * proverbs.size())));
+			}
+
 		}
 	}
 

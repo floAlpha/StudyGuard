@@ -17,13 +17,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.yangheng.StudyGuard.PlanNotifier;
 import com.yangheng.StudyGuard.Object.StudyPlan;
+import com.yangheng.StudyGuard.Utils.IOUtils;
+import com.yangheng.StudyGuard.Utils.Utils;
 
 public class PlanInfoFrame extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
-
 
 	private JPanel contentPane;
 
@@ -59,23 +59,6 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 		tasks.add(task12);
 	}
 
-	static PlanInfoFrame instance = null;
-
-	// 实现阻止程序多次启动
-	public static PlanInfoFrame getInstance() {
-
-		
-		if (instance == null) {
-			synchronized (PlanInfoFrame.class) {
-				if (instance == null) {
-					instance = new PlanInfoFrame();
-			
-				}
-			}
-		}
-		return instance;
-	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -83,7 +66,6 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
-		this.setAlwaysOnTop(true);
 		this.setLocationRelativeTo(null);
 
 		final Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -94,7 +76,6 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 					KeyEvent evt = (KeyEvent) e;
 					if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						dispose();
-
 					}
 				}
 			}
@@ -103,11 +84,9 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				MainFrame.ioUtils.updateStudyPlan();
-				
+				IOUtils.writeStudyPlan();
 			}
 		});
-
 
 		setTitle("\u5B66\u4E60\u8BA1\u5212");
 		setBounds(100, 100, 525, 481);
@@ -350,26 +329,32 @@ public class PlanInfoFrame extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		
-		while (true) {
-			
-			for (int i = 0; i < PlanNotifier.planlist.size(); i++) {
-				StudyPlan sp = new StudyPlan(PlanNotifier.planlist.get(i));
-				tasks.get(i).setText(sp.getTask());
-				labels.get(i).setText(sp.getTime());
-				labels_finish.get(i).setText(sp.getFinish());
-				if (labels_finish.get(i).getText().equals("完成")) {
-					labels_finish.get(i).setForeground(Color.GREEN);
-				} else if (labels_finish.get(i).getText().equals("未完成")) {
-					labels_finish.get(i).setForeground(Color.RED);
-				} else {
-					labels_finish.get(i).setForeground(Color.GRAY);
-				}
-			}
 
+		while (true) {
 			try {
+				ArrayList<String> planlist = Utils.readTxtFileIntoStringArrList(
+						IOUtils.filepath + "/plan/" + Utils.getTime().substring(0, 11) + ".txt");
+				for (int i = 0; i < planlist.size(); i++) {
+					StudyPlan sp = new StudyPlan(planlist.get(i));
+					tasks.get(i).setText(sp.getTask());
+					labels.get(i).setText(sp.getTime());
+					labels_finish.get(i).setText(sp.getFinish());
+					if (labels_finish.get(i).getText().equals("完成")) {
+						labels_finish.get(i).setForeground(Color.GREEN);
+					} else if (labels_finish.get(i).getText().equals("未完成")) {
+						labels_finish.get(i).setForeground(Color.RED);
+					} else {
+						labels_finish.get(i).setForeground(Color.GRAY);
+					}
+					tasks.get(i).setToolTipText("<html>参数：" + sp.getArgs() + "<br>备注：" + sp.getDetail() + "</html>");
+				}
 				Thread.sleep(3000);
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				e.printStackTrace();
 			}
 

@@ -21,6 +21,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import com.yangheng.StudyGuard.Object.Idea;
+import com.yangheng.StudyGuard.Utils.IOUtils;
 import com.yangheng.StudyGuard.Utils.Utils;
 
 public class IdeaInfoFrame extends JFrame {
@@ -31,9 +32,9 @@ public class IdeaInfoFrame extends JFrame {
 	public static IdeaInfoFrame instance = null; // 实现阻止程序多次启动
 	private JScrollPane scrollPane_1;
 	static public Idea idea;
-	
+
 	public static IdeaInfoFrame getInstance(Idea idea) {
-		IdeaInfoFrame.idea=idea;
+		IdeaInfoFrame.idea = idea;
 		if (instance == null) {
 			synchronized (IdeaInfoFrame.class) {
 				if (instance == null) {
@@ -48,7 +49,7 @@ public class IdeaInfoFrame extends JFrame {
 	}
 
 	private static void updateIdea(Idea idea) {
-		ArrayList<String> ideas = MainFrame.ioUtils.getIdeaslist();
+		ArrayList<String> ideas = IOUtils.ideaslist;
 
 		for (int i = 0; i < ideas.size(); i++)
 
@@ -61,22 +62,18 @@ public class IdeaInfoFrame extends JFrame {
 		}
 
 	}
-	
+
 	public static void disableDisplay(String content) {
-		
-		for (int i = 0; i < MainFrame.ioUtils.getIdeaslist().size(); i++) {
-			if (Utils.getValueOfElementByTag(MainFrame.ioUtils.getIdeaslist().get(i), "[content]").equals(content)) {
-				
-				MainFrame.ioUtils.getIdeaslist().set(i, MainFrame.ioUtils.getIdeaslist().get(i).replace("DISPLAY", "NODISPLAY"));
-				// ideas.remove(ideas.get(i));
-				// ideas.add(ideas.get(i).replace("DISPLAY", "NODISPLAY"));
+
+		for (int i = 0; i < IOUtils.ideaslist.size(); i++) {
+			if (Utils.getValueOfElementByTag(IOUtils.ideaslist.get(i), "[content]").equals(content)) {
+				IOUtils.ideaslist.set(i, IOUtils.ideaslist.get(i).replace("DISPLAY", "NODISPLAY"));
 			}
 		}
-//		updateIdea(idea);
 	}
 
 	private IdeaInfoFrame() {
-		
+
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 555, 420);
 		contentPane = new JPanel();
@@ -149,17 +146,17 @@ public class IdeaInfoFrame extends JFrame {
 	public void updateView(Idea idea) {
 		if (idea.toString().contains(".png")) {
 			try {
-				Runtime.getRuntime().exec("explorer "+idea.toString());
+				Runtime.getRuntime().exec("explorer " + idea.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}else {
-			IdeaInfoFrame.idea=idea;
+		} else {
+			IdeaInfoFrame.idea = idea;
 			setTitle("速记回顾 " + idea.getTime() + " 任何修改都会被保存");
 			textArea.setText(idea.getContent().replace("[换行]", "\n"));
 			invalidate();
 		}
-		
+
 	}
 
 }

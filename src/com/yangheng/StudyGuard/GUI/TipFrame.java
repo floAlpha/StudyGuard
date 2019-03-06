@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -24,10 +25,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import com.yangheng.StudyGuard.Utils.IOUtils;
 import com.yangheng.StudyGuard.Utils.Utils;
-import javax.swing.SwingConstants;
 
 public class TipFrame extends JFrame implements Runnable {
 
@@ -66,6 +68,7 @@ public class TipFrame extends JFrame implements Runnable {
 		setLocation(sc.width / 3, sc.height / 9);
 		setUndecorated(true); // 窗口去边框
 		setAlwaysOnTop(true); // 设置窗口总在最前
+
 		setBackground(new Color(0, 0, 0, 0)); // 设置窗口背景为透明色
 		setType(JFrame.Type.UTILITY);// 隐藏任务栏图标
 		addMouseListener(new MouseAdapter() // 设置窗口可拖动
@@ -87,11 +90,11 @@ public class TipFrame extends JFrame implements Runnable {
 		contentPane.setOpaque(false);
 		tip.setHorizontalAlignment(SwingConstants.CENTER);
 
-		tip.setFont(new Font("华文行楷", Font.PLAIN, 26));
+		tip.setFont(new Font("等线", Font.PLAIN, 26));
 		tip.setOpaque(false);
 		tip.setBorder(BorderFactory.createLineBorder(Color.BLACK, 0));
-//		tip.setWrapStyleWord(true);
-//		tip.setLineWrap(true);
+		// tip.setWrapStyleWord(true);
+		// tip.setLineWrap(true);
 		tip.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
 		tip.setAlignmentY(JTextArea.CENTER_ALIGNMENT);
 		tip.setEditable(false);
@@ -118,10 +121,10 @@ public class TipFrame extends JFrame implements Runnable {
 				mouseAtX = e.getPoint().x;
 				mouseAtY = e.getPoint().y;
 			}
-
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				saveImgFromClipboard(MainFrame.filePath + "\\idea\\pic\\" + Utils.getTime().substring(0,15) + "DISPLAY.png");
+				saveImgFromClipboard(
+						MainFrame.filePath + "\\idea\\pic\\" + Utils.getTime() + "DISPLAY.png");
 				String tmpString = proverb.getText();
 				MainFrame.showToast("提示", "已保存剪切板截图到速记", MessageType.INFO);
 
@@ -167,8 +170,9 @@ public class TipFrame extends JFrame implements Runnable {
 		proverb.setAlignmentY(JTextArea.CENTER_ALIGNMENT);
 		contentPane.add(proverb);
 		proverb.setBorder(BorderFactory.createLineBorder(Color.BLACK, 0));
-	
+
 		setContentPane(contentPane);
+		setVisible(true);
 
 	}
 
@@ -187,19 +191,98 @@ public class TipFrame extends JFrame implements Runnable {
 		invalidate();
 	}
 
+	/**
+	 * @param rate
+	 *            压缩的比例
+	 */
+	public static BufferedImage reduceImg(BufferedImage img, Float rate) {
+		try {
+			
+			int widthdist = 0, heightdist = 0;
+			// 如果比例不为空则说明是按比例压缩
+			if (rate != null && rate > 0) {
+				// 获得源图片的宽高存入数组中
+				int[] results = { img.getWidth(), img.getHeight() };
+			
+				if (results == null || results[0] == 0 || results[1] == 0) {
+					return null;
+				} else {
+					// 按比例缩放或扩大图片大小，将浮点型转为整型
+					widthdist = (int) (results[0] * rate);
+					heightdist = (int) (results[1] * rate);
+				}
+			}
+			// 开始读取文件并进行压缩
+			// Image src = ImageIO.read(srcfile);
+			// // 构造一个类型为预定义图像类型之一的 BufferedImage
+//			System.out.println(widthdist);
+//			System.err.println(heightdist);
+			BufferedImage tag = new BufferedImage((int) widthdist, (int) heightdist, BufferedImage.TYPE_INT_RGB);
+
+			// 绘制图像
+			// getScaledInstance表示创建此图像的缩放版本，返回一个新的缩放版本Image,按指定的width,height呈现图像
+			// Image.SCALE_SMOOTH,选择图像平滑度比缩放速度具有更高优先级的图像缩放算法。
+			tag.getGraphics().drawImage(((Image) img).getScaledInstance(widthdist, heightdist, Image.SCALE_SMOOTH), 0,
+					0, null);
+			return tag;
+
+		} catch (Exception ef) {
+			ef.printStackTrace();
+		}
+		return null;
+	}
+
+	// /**
+	// * 获取图片宽度和高度
+	// *
+	// * @param 图片路径
+	// * @return 返回图片的宽度
+	// */
+	// public static int[] getImgWidthHeight(File file) {
+	// InputStream is = null;
+	// BufferedImage src = null;
+	// int result[] = { 0, 0 };
+	// try {
+	// // 获得文件输入流
+	// is = new FileInputStream(file);
+	// // 从流里将图片写入缓冲图片区
+	// src = ImageIO.read(is);
+	// result[0] =src.getWidth(null); // 得到源图片宽
+	// result[1] =src.getHeight(null);// 得到源图片高
+	// is.close(); //关闭输入流
+	// } catch (Exception ef) {
+	// ef.printStackTrace();
+	// }
+	//
+	// return result;
+	// }
+
 	public static boolean saveImgFromClipboard(String path) {
+	
 		if (path != null) {
 			path = path.replace(":", "-");
 			try {
 				Image image = getImageFromClipboard();
-				File file = new File(path);
-				BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
-						BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = bufferedImage.createGraphics();
-				g.drawImage(image, null, null);
+				if (image != null) {
+					BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
+							BufferedImage.TYPE_INT_ARGB);
+					Graphics2D g = bufferedImage.createGraphics();
+					g.drawImage(image, null, null);
+					File file = new File(path);
+					ImageIO.write((RenderedImage) bufferedImage, "png", file);
+				} else {
+					List<File> files = getFileFromClipboard();
+					for (int i = 0; i < files.size(); i++) {
+						image = ImageIO.read(files.get(i));
+						BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
+								BufferedImage.TYPE_INT_ARGB);
+						Graphics2D g = bufferedImage.createGraphics();
+						g.drawImage(image, null, null);
+						BufferedImage img = reduceImg(bufferedImage, Float.valueOf((float) (800.0 / bufferedImage.getWidth())));
+						ImageIO.write((RenderedImage) img, "png", new File(path.replace(".png", " " + i + "th.png")));
+					}
 
-				ImageIO.write((RenderedImage) bufferedImage, "png", file);
-
+				}
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -221,6 +304,20 @@ public class TipFrame extends JFrame implements Runnable {
 		return null;
 	}
 
+	/**
+	 * 从剪切板获得图片。
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<File> getFileFromClipboard() throws Exception {
+		Clipboard sysc = Toolkit.getDefaultToolkit().getSystemClipboard();
+		Transferable cc = sysc.getContents(null);
+		if (cc == null)
+			return null;
+		else if (cc.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+			return (List<File>) cc.getTransferData(DataFlavor.javaFileListFlavor);
+		return null;
+	}
+
 	@Override
 	public void run() {
 
@@ -231,9 +328,26 @@ public class TipFrame extends JFrame implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			ArrayList<String> proverbs = MainFrame.ioUtils.getProverblist();
-			ArrayList<String> planList = MainFrame.ioUtils.getPlanlist();
-			updateTip(null, proverbs.get((int) (Math.random() * proverbs.size())).toString());
+			ArrayList<String> planList = IOUtils.planlist;
+
+			if (Utils.poems.equals("true")) {
+				String json = IOUtils.sendGet("https://api.gushi.ci/all.json", null);
+				if (json != null) {
+					String[] items = json.split(",");
+					for (String string : items) {
+						if (string.contains("content")) {
+							updateTip(null, string.split("\"")[string.split("\"").length - 1].replace("。", ""));
+							break;
+						}
+					}
+				} else {
+					updateTip(null, "请求内容失败");
+				}
+			} else {
+				ArrayList<String> proverbs = IOUtils.proverblist;
+				updateTip(null, proverbs.get((int) (Math.random() * proverbs.size())).toString());
+			}
+
 			boolean b = true;
 			for (String string : planList) {
 				if (Utils.getValueOfElementByTag(string, "[time]").compareTo(Utils.getTime().substring(12, 17)) < 0) {
@@ -246,7 +360,6 @@ public class TipFrame extends JFrame implements Runnable {
 				updateTip("暂无任务，请添加", null);
 			}
 			try {
-				// updateTip("截图后点击红色字体可保存截图到速记", "双击速记显示浮窗可屏蔽该条速记");
 				Thread.sleep(60000 * 3);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

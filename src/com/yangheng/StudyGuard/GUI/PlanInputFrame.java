@@ -14,8 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -27,6 +25,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.yangheng.StudyGuard.Object.StudyPlan;
+import com.yangheng.StudyGuard.Utils.IOUtils;
 import com.yangheng.StudyGuard.Utils.Utils;
 
 public class PlanInputFrame extends JFrame {
@@ -59,18 +58,11 @@ public class PlanInputFrame extends JFrame {
 			StudyPlan studyPlan = new StudyPlan(
 					"[time]" + hour.getText() + ":" + min.getText() + "[time] [task]" + task.getText()
 							+ "[task] [detail]" + detail.getText() + "[detail] [args]" + args.getText() + "[args]");
+			IOUtils.planlist.add(studyPlan.toString());
 
-			ArrayList<String> newplan = new ArrayList<String>();
-			newplan.add(studyPlan.toString());
-			try {
-				Utils.writeObjectsToFile(newplan,
-						MainFrame.filePath + "\\plan\\" + Utils.getTime().substring(0, 11) + ".txt");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			IOUtils.writeStudyPlan();
 			dispose();
 		}
-
 	}
 
 	/**
@@ -101,9 +93,10 @@ public class PlanInputFrame extends JFrame {
 					if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 						dispose();
 					}
-					if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-						planInput();
-					}
+//					if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+//						planInput();
+//						dispose();
+//					}
 				}
 			}
 		}, AWTEvent.KEY_EVENT_MASK);
@@ -184,6 +177,7 @@ public class PlanInputFrame extends JFrame {
 		submit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				planInput();
+				dispose();
 			}
 		});
 		submit.setFont(new Font("楷体", Font.PLAIN, 16));
@@ -256,24 +250,15 @@ public class PlanInputFrame extends JFrame {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
 				try {
-					// 如果拖入的文件格式受支持
-//					if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-						// 接收拖拽来的数据
-						dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-						@SuppressWarnings("unchecked")
-						List<File> list = (List<File>) (dtde.getTransferable()
-								.getTransferData(DataFlavor.javaFileListFlavor));
-						args.setText("");
-						for (File file : list) {
-							args.setText(file.getAbsolutePath());
-
-						}
-						// 指示拖拽操作已完成
-						dtde.dropComplete(true);
-//					} else {
-//						 拒绝拖拽来的数据
-//						dtde.rejectDrop();
-//					}
+					dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+					@SuppressWarnings("unchecked")
+					List<File> list = (List<File>) (dtde.getTransferable()
+							.getTransferData(DataFlavor.javaFileListFlavor));
+					args.setText("");
+					for (File file : list) {
+						args.setText(file.getAbsolutePath());
+					}
+					dtde.dropComplete(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

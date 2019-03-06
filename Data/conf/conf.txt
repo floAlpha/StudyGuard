@@ -1,9 +1,10 @@
 [pausequery]00:00[pausequery] [detail]自动关闭学习询问时间
 [startquery]07:30[startquery] [detail]自动开启学习询问时间
-[dailysumtime]22:00[dailysumtime] [detail]生成每日学习报告时间，必须在当天00:00之前
-[cascadedelay]true[cascadedelay] [detail]推迟一个任务，当天该任务之后的任务是否级联推迟
+[dailysumtime]00:42[dailysumtime] [detail]生成每日学习报告时间，必须在当天00:00之前
+[cascadedelay]true[ascadedelay] [detail]推迟一个任务，当天该任务之后的任务是否级联推迟
 [nomainwindow]false[nomainwindow] [detail]无主界面启动，程序常驻后台
 [nextideashow]1[nextideashow] [detail]显示idea的时间间隔，时间单位分钟，设置为0则随机出现下一条idea回顾
 [randomideashow]true[randomideashow] [detail]随机回顾记录的idea
 [tiponwindow]true[tiponwindow] [detail]使用悬浮窗显示速记，false则使用通知显示[detail]
 [tipwinsizelevel]1[tipwinsizelevel] [detail]控制速记回顾悬浮窗尺寸等级，分为1，2，3级[detail]
+[poems]true[poems] [detail][detail]
